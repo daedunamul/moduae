@@ -4,142 +4,182 @@
 */
 #include "pdb_BST.h"
 
-struct pdb_bst_Parameter pdb_bst_search( struct pdb_bst_Node *TopNode , uint64_t Key )
+struct pdb_bst_Node* pdb_bst_search( struct pdb_bst_Node *RootNode , char *Key )
 {
-	struct pdb_bst_Parameter Parameter = { .ParentNode = TopNode , .Node = TopNode , .Status = pdb_bst_status_NULL } ;
+	struct pdb_bst_Node *TempNode = RootNode ;
+	uint8_t Count ;
 	
-	if( Parameter.Node != pmem_NULL )
+	while( TempNode != pmem_NULL )
 	{
-		Parameter.Status = pdb_bst_status_NONEOFPARENT ;
-		
-		while( true )
+		for( Count = 0 ; Count < pdb_bst_key_LENGTH ; Count ++ )
 		{
-			if( Key == Parameter.Node->Key )
-				break ;
-			else if( Key < Parameter.Node->Key )
+			if( Key[ Count ] < TempNode->Key[ Count ] )
 			{
-				if( Parameter.Node->Left == pmem_NULL )
+				TempNode = TempNode->Left ;
+				break ;
+			}
+			else if( Key[ Count ] > TempNode->Key[ Count ] )
+			{
+				TempNode = TempNode->Right ;
+				break ;
+			}
+		}
+		
+		if( Count == pdb_bst_key_LENGTH )
+			break ;
+	}
+	
+	return TempNode ;
+}
+
+bool pdb_bst_insert( struct pdb_bst_Node **RootNode , struct pdb_bst_Node *NewNode )
+{
+	struct pdb_bst_Node *TempNode = *RootNode ;
+	uint8_t Count ;
+
+	while( TempNode != pmem_NULL )
+	{
+		for( Count = 0 ; Count < pdb_bst_key_LENGTH ; Count ++ )
+		{
+			if( NewNode->Key[ Count ] < TempNode->Key[ Count ] )
+			{
+				if( TempNode->Left == pmem_NULL )
 				{
-					Parameter.Status = pdb_bst_status_NONEOFLEFT ;
-					break ;
+					TempNode->Left = NewNode ;
+					return true ;
 				}
+				
+				TempNode = TempNode->Left ;
+				break ;
+			}
+			else if( NewNode->Key[ Count ] > TempNode->Key[ Count ] )
+			{
+				if( TempNode->Right == pmem_NULL )
+				{
+					TempNode->Right = NewNode ;
+					return true ;
+				}
+				
+				TempNode = TempNode->Right ;
+				break ;
+			}
+		}
+		
+		if( Count == pdb_bst_key_LENGTH )
+			return false ;
+	}
+	
+	*RootNode = NewNode ;
+	return true ;
+}
+struct pdb_bst_Node* pdb_bst_desert( struct pdb_bst_Node **RootNode , char *Key )
+{
+	struct pdb_bst_Node *ChildNode = *RootNode , *ParentNode = ChildNode , *TempParentNode , *TempChildNode ;
+	uint8_t Count ;
+	bool Flag ;
+	
+	while( ChildNode != pmem_NULL )
+	{
+		 for( Count = 0 ; Count < pdb_bst_key_LENGTH ; Count ++ )
+		 {
+			if( Key[ Count ] < ChildNode->Key[ Count ] )
+			{
+				ParentNode = ChildNode ;
+				ChildNode = ChildNode->Left ;
+				Flag = false ;
+				break ;
+			}
+			else if( Key[ Count ] > ChildNode->Key[ Count ] )
+			{
+				ParentNode = ChildNode ;
+				ChildNode = ChildNode->Right ;
+				Flag = true ;
+				break ;
+			}
+		}
+		
+		if( Count == pdb_bst_key_LENGTH )
+		{
+			if( ChildNode == *RootNode )
+			{
+				if( ChildNode->Left == pmem_NULL && ChildNode->Right == pmem_NULL )
+					*RootNode = pmem_NULL ;
+				else if( ChildNode->Left != pmem_NULL && ChildNode->Right == pmem_NULL )
+					*RootNode = ( *RootNode )->Left ;
+				else if( ChildNode->Left == pmem_NULL && ChildNode->Right != pmem_NULL )
+					*RootNode = ( *RootNode )->Right ;
+				else
+				{
+					for
+					(
+						TempChildNode = ChildNode->Right , TempParentNode = TempChildNode ; 
+						TempChildNode->Left != pmem_NULL ; 
+						TempParentNode = TempChildNode , TempChildNode = TempChildNode->Left 
+					) ;
+				
+					if( TempChildNode == TempParentNode )
+						TempChildNode->Left = ChildNode->Left ;
+					else
+					{
+						TempParentNode->Left = TempChildNode->Right ;
+						TempChildNode->Left = ChildNode->Left ;
+						TempChildNode->Right = ChildNode->Right ;
+					}
 					
-				Parameter.Status = pdb_bst_status_LEFTOFPARENT ;
-				Parameter.ParentNode = Parameter.Node ;
-				Parameter.Node = Parameter.Node->Left ;
+					*RootNode = TempChildNode ;
+				}
 			}
 			else
 			{
-				if( Parameter.Node->Right == pmem_NULL )
+				if( ChildNode->Left == pmem_NULL && ChildNode->Right == pmem_NULL )
 				{
-					Parameter.Status = pdb_bst_status_NONEOFRIGHT ;
-					break ;
+					if( Flag )
+						ParentNode->Right = pmem_NULL ;
+					else
+						ParentNode->Left = pmem_NULL ;
 				}
+				else if( ChildNode->Left != pmem_NULL && ChildNode->Right == pmem_NULL )
+				{
+					if( Flag )
+						ParentNode->Right = ChildNode->Left ;
+					else
+						ParentNode->Left = ChildNode->Left ;
+				}
+				else if( ChildNode->Left == pmem_NULL && ChildNode->Right != pmem_NULL )
+				{
+					if( Flag )
+						ParentNode->Right = ChildNode->Right ;
+					else
+						ParentNode->Left = ChildNode->Right ;
+				}
+				else
+				{
+					for
+					(
+						TempChildNode = ChildNode->Right , TempParentNode = TempChildNode ; 
+						TempChildNode->Left != pmem_NULL ; 
+						TempParentNode = TempChildNode , TempChildNode = TempChildNode->Left 
+					) ;
 				
-				Parameter.Status = pdb_bst_status_RIGHTOFPARENT ;
-				Parameter.ParentNode = Parameter.Node ;
-				Parameter.Node = Parameter.Node->Right ;
+					if( TempChildNode == TempParentNode )
+						TempChildNode->Left = ChildNode->Left ;
+					else
+					{
+						TempParentNode->Left = TempChildNode->Right ;
+						TempChildNode->Left = ChildNode->Left ;
+						TempChildNode->Right = ChildNode->Right ;
+					}
+				
+					if( Flag )
+						ParentNode->Right = TempChildNode ;
+					else
+						ParentNode->Left = TempChildNode ;
+				}
 			}
-		}
-	}
-	
-	return Parameter ;
-}
-struct pdb_bst_Parameter pdb_bst_getCandidate( struct pdb_bst_Node *Node )
-{
-	struct pdb_bst_Parameter Parameter = { .ParentNode = Node , .Node = Node , .Status = pdb_bst_status_NULL } ;
-	
-	if( Parameter.Node != pmem_NULL )
-	{
-		if( ( Parameter.Node->Left != pmem_NULL ) && ( Parameter.Node->Right != pmem_NULL ) )
-		{
-			for( Parameter.Node = Parameter.Node->Right ; Parameter.Node->Left != pmem_NULL ; Parameter.ParentNode = Parameter.Node , Parameter.Node = Parameter.Node->Left ) ;
-			Parameter.Status = pdb_bst_status_BOTHOFPARENT ;
-		}
-		else if( Parameter.Node->Left != pmem_NULL )
-		{
-			Parameter.Node = Parameter.Node->Left ;
-			Parameter.Status = pdb_bst_status_LEFTOFPARENT ;
-		}
-		else if( Parameter.Node->Right != pmem_NULL )
-		{
-			Parameter.Node = Parameter.Node->Right ;
-			Parameter.Status = pdb_bst_status_RIGHTOFPARENT ;
-		}
-		else
-			Parameter.Status = pdb_bst_status_NONEOFPARENT ;
-	}
-	
-	return Parameter ;
-}
-bool pdb_bst_insert( struct pdb_bst_Node **TopNode , struct pdb_bst_Node *NewNode )
-{
-	struct pdb_bst_Parameter Parameter = pdb_bst_search( *TopNode , NewNode->Key ) ;
-	
-
-	switch( Parameter.Status )
-	{
-		case pdb_bst_status_NONEOFPARENT :
-		case pdb_bst_status_LEFTOFPARENT : 
-		case pdb_bst_status_RIGHTOFPARENT : 
-			return false ;
 			
-		case pdb_bst_status_NULL :
-			*TopNode = NewNode ;
-		break ;
-		case pdb_bst_status_NONEOFLEFT :
-			Parameter.Node->Left = NewNode ;
-		break ;
-		case pdb_bst_status_NONEOFRIGHT :
-			Parameter.Node->Right = NewNode ;
-		break ;
+			break ;
+		}
 	}
 	
-	return true ;
-}
-struct pdb_bst_Node* pdb_bst_desert( struct pdb_bst_Node **TopNode , uint64_t Key )
-{
-	struct pdb_bst_Parameter Parameter = pdb_bst_search( *TopNode , Key ) , ChildParameter ;
-	struct pdb_bst_Node **TempNode ;
-	
-	switch( Parameter.Status )
-	{
-		case pdb_bst_status_NULL :
-		case pdb_bst_status_NONEOFLEFT :
-		case pdb_bst_status_NONEOFRIGHT :
-			return pmem_NULL ;
-		
-		case pdb_bst_status_NONEOFPARENT : 
-			TempNode = TopNode ;
-		break ;
-		case pdb_bst_status_LEFTOFPARENT :
-			TempNode = &( Parameter.ParentNode->Left ) ;
-		break ;
-		case pdb_bst_status_RIGHTOFPARENT :
-			TempNode = &( Parameter.ParentNode->Right ) ;
-		break ;
-	}
-
-	ChildParameter = pdb_bst_getCandidate( Parameter.Node ) ;
-	switch( ChildParameter.Status )
-	{
-		case pdb_bst_status_NONEOFPARENT : 
-			*TempNode = pmem_NULL ;
-		break ;
-		case pdb_bst_status_LEFTOFPARENT : 
-		case pdb_bst_status_RIGHTOFPARENT : 
-			*TempNode = ChildParameter.Node ;
-		break ;
-		
-		case pdb_bst_status_BOTHOFPARENT : 
-			ChildParameter.Node->Left = Parameter.Node->Left ;
-			if( ChildParameter.ParentNode != Parameter.Node )
-				ChildParameter.Node->Right = Parameter.Node->Right ;
-			
-			ChildParameter.ParentNode->Left = pmem_NULL ;
-			*TempNode = ChildParameter.Node ;
-		break ;
-	}
-			
-	return Parameter.Node ;
+	return ChildNode ;
 }
