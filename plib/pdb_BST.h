@@ -13,6 +13,7 @@ enum
 struct pdb_bst_Node
 {
 	char *Key ;
+	void *Value ;
 	struct pdb_bst_Node *Left , *Right ;
 } ;
 
