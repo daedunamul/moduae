@@ -60,7 +60,7 @@ bool bst_insert( struct bst_Node **RootNode , struct bst_Node *NewNode , enum bs
 	*RootNode = NewNode ;
 	return true ;
 }
-struct bst_Node* pdb_bst_desert( struct bst_Node **RootNode , char *Key , enum bst_STATUS ( *judge )( void *Key1 , void *Key2 ) )
+struct bst_Node* bst_desert( struct bst_Node **RootNode , char *Key , enum bst_STATUS ( *judge )( void *Key1 , void *Key2 ) )
 {
 	struct bst_Node *ChildNode = *RootNode , *ParentNode = ChildNode , *TempParentNode , *TempChildNode ;
 	enum bst_STATUS Status ;
