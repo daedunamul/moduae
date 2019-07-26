@@ -6,7 +6,7 @@
 // pool
 bool pmem_pool_create( struct pmem_Pool *Pool , uint8_t Size , uint8_t Length )
 {
-	if( Pool != NULL || Size = 0 || Length == 0 )
+	if( Pool != NULL || Size == 0 || Length == 0 )
 		return false ;
 	
 	Pool->Size = Size ;
