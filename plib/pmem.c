@@ -26,6 +26,11 @@ bool pmem_pool_delete( struct pmem_Pool *Pool )
 	free( Pool->Memory ) ;
 	free( Pool->FreeStack ) ;
 	
+	Pool->Size = 0 ;
+	Pool->Length = 0 ;
+	Pool->Memory = NULL ;
+	Pool->FreeStack = NULL ;
+	
 	return true ;
 }
 void* pmem_pool_allocate( struct pmem_Pool *Pool )
