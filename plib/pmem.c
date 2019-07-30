@@ -29,7 +29,7 @@ bool pmem_pool_create( struct pmem_Pool *Pool , uint8_t Size , uint8_t Length )
 }
 bool pmem_pool_delete( struct pmem_Pool *Pool )
 {
-	if( Pool == NULL )
+	if( Pool == NULL || Pool->Memory == NULL || Pool->FreeStack == NULL )
 		return false ;
 	
 	free( Pool->Memory ) ;
