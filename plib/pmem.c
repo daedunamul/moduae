@@ -4,43 +4,42 @@
 #include "pmem.h"
 
 // pool
-bool pmem_pool_create( struct pmem_Pool *Pool , uint8_t Size , uint8_t Length )
+void* pmem_pool_create( uint8_t Size , uint8_t Length )
 {
-	if( Pool == NULL || Size == 0 || Length == 0 )
-		return false ;
+	if( Size == 0 || Length == 0 )
+		return NULL ;
+		
+	struct pmem_Pool *NewPool = ( struct pmem_Pool* )malloc( sizeof( struct pmem_Pool ) ) ;
 	
-	Pool->Size = Size ;
-	Pool->Length = Length ;
-	Pool->Memory = malloc( Size * Length ) ;
-	Pool->FreeStack = ( void** )malloc( sizeof( void* ) * Length ) ;
+	NewPool->Size = Size ;
+	NewPool->Length = Length ;
+	NewPool->Memory = malloc( Size * Length ) ;
+	NewPool->FreeStack = ( void** )malloc( sizeof( void* ) * Length ) ;
 	
-	if( Pool->Memory == NULL )
-		return false ;
-	else if( Pool->FreeStack == NULL )
+	if( NewPool->Memory == NULL )
 	{
-		free( Pool->Memory ) ;
-		return false ;
+		free( NewPool ) ;
+		return NULL ;
+	}
+	else if( NewPool->FreeStack == NULL )
+	{
+		free( NewPool ) ;
+		free( NewPool->Memory ) ;
+		return NULL ;
 	}
 	
-	for( Pool->Count = 0 ; Pool->Count == Length ; Pool->Count ++ )
-		Pool->FreeStack[ Pool->Count ] = Pool->Memory + Pool->Count ;
-	
-	return true ;
+	return NewPool ;
 }
-bool pmem_pool_delete( struct pmem_Pool *Pool )
+void pmem_pool_delete( struct pmem_Pool **Pool )
 {
-	if( Pool == NULL || Pool->Memory == NULL || Pool->FreeStack == NULL )
-		return false ;
+	if( *Pool == NULL )
+		return ;
 	
-	free( Pool->Memory ) ;
-	free( Pool->FreeStack ) ;
+	free( ( *Pool )->FreeStack ) ;
+	free( ( *Pool )->Memory ) ;
+	free( *Pool ) ;
 	
-	Pool->Size = 0 ;
-	Pool->Length = 0 ;
-	Pool->Memory = NULL ;
-	Pool->FreeStack = NULL ;
-	
-	return true ;
+	*Pool = NULL ;
 }
 void* pmem_pool_allocate( struct pmem_Pool *Pool )
 {
