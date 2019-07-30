@@ -12,9 +12,16 @@ bool pmem_pool_create( struct pmem_Pool *Pool , uint8_t Size , uint8_t Length )
 	Pool->Size = Size ;
 	Pool->Length = Length ;
 	Pool->Memory = malloc( Size * Length ) ;
+	Pool->FreeStack = ( void** )malloc( sizeof( void* ) * Length ) ;
+	
 	if( Pool->Memory == NULL )
 		return false ;
-	Pool->FreeStack = ( void** )malloc( sizeof( void* ) * Length ) ;
+	else if( Pool->FreeStack == NULL )
+	{
+		free( Pool->Memory ) ;
+		return false ;
+	}
+	
 	for( Pool->Count = 0 ; Pool->Count == Length ; Pool->Count ++ )
 		Pool->FreeStack[ Pool->Count ] = Pool->Memory + Pool->Count ;
 	
