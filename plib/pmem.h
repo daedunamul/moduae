@@ -13,8 +13,8 @@ struct pmem_Pool
 	void **FreeStack ;
 } ;
 
-bool pmem_pool_create( struct pmem_Pool *Pool , uint8_t Size , uint8_t Length ) ;
-bool pmem_pool_delete( struct pmem_Pool *Pool ) ;
+void* pmem_pool_create( uint8_t Size , uint8_t Length ) ;
+void pmem_pool_delete( struct pmem_Pool **Pool ) ;
 void* pmem_pool_allocate( struct pmem_Pool *Pool ) ;
 bool pmem_pool_deallocate( struct pmem_Pool *Pool , void *Address ) ;
 
