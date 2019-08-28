@@ -5,18 +5,17 @@
 #include "core/bst.h"
 #include <stdlib.h>
 
-// pool
-struct pmem_Pool
+// bst pool
+struct pmem_bst_Pool
 {
-	uint8_t Size , Length , Count ;
-	void *Memory ;
-	void **FreeStack ;
+	uint32_t MaxCount , Count ;
+	struct bst_Node *Entry ;
 } ;
 
-void* pmem_pool_create( uint8_t Size , uint8_t Length ) ;
-void pmem_pool_delete( struct pmem_Pool **Pool ) ;
-void* pmem_pool_allocate( struct pmem_Pool *Pool ) ;
-bool pmem_pool_deallocate( struct pmem_Pool *Pool , void *Address ) ;
+struct pmem_bst_Pool* pmem_bst_createPool( uint32_t MaxCount ) ;
+bool pmem_bst_deletePool( struct pmem_bst_Pool **Pool ) ;
+struct bst_Node* pmem_bst_allocatePool( struct pmem_bst_Pool *Pool ) ;
+void pmem_bst_deallocatePool( struct pmem_bst_Pool *Pool , struct bst_Node *Node ) ;
 
 // manager
 struct pmem_Manager
