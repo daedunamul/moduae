@@ -22,7 +22,7 @@ void plibPmem_bst_deallocatePool( struct plibPmem_bst_Pool *Pool , struct plibSt
 struct plibPmem_Manager
 {
 	uint32_t Count ;
-	struct plibStdBST *RootMemoryNode ;
+	struct plibStdBST_Node *RootMemoryNode ;
 } ;
 
 enum plibStdBST_STATUS plibPmem_manager_judge( void *Key1 , void *Key2 ) ;
