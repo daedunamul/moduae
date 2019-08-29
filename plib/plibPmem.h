@@ -16,7 +16,7 @@ struct plibPmem_bst_Pool
 struct plibPmem_bst_Pool* plibPmem_bst_createPool( uint32_t MaxCount ) ;
 bool plibPmem_bst_deletePool( struct plibPmem_bst_Pool **Pool ) ;
 struct plibStdBST_Node* plibPmem_bst_allocatePool( struct plibPmem_bst_Pool *Pool ) ;
-void plibPmem_bst_deallocatePool( struct plibPmem_bst_Pool *Pool , struct plibStdBST *Node ) ;
+void plibPmem_bst_deallocatePool( struct plibPmem_bst_Pool *Pool , struct plibStdBST_Node *Node ) ;
 
 // manager
 struct plibPmem_Manager
