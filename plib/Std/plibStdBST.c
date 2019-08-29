@@ -1,21 +1,22 @@
-/* 
-	binary search tree
+/*
+	plib
+	Std
+	Binary Search Tree
 */
-#include <stdbool.h>
-#include "bst.h"
+#include "plibStdBST.h"
 
-struct bst_Node* bst_search( struct bst_Node *RootNode , void *Key , enum bst_STATUS ( *judge )( void *Key1 , void *Key2 ) )
+struct plibStdBST_Node* plibStdBST_search( struct plibStdBST_Node *RootNode , void *Key , enum plibStdBST_STATUS ( *judge )( void *Key1 , void *Key2 ) )
 {
-	struct bst_Node *TempNode = RootNode ;
-	enum bst_STATUS Status ;
+	struct plibStdBST_Node *TempNode = RootNode ;
+	enum plibStdBST_STATUS Status ;
 	
 	while( TempNode != NULL )
 	{
 		Status = judge( Key , TempNode->Key ) ;
 		
-		if( Status == bst_status_LESS )
+		if( Status == plibStdBST_status_LESS )
 			TempNode = TempNode->Left ;
-		else if( Status == bst_status_GREAT )
+		else if( Status == plibStdBST_status_GREAT )
 			TempNode = TempNode->Right ;
 		else
 			break ;
@@ -24,16 +25,16 @@ struct bst_Node* bst_search( struct bst_Node *RootNode , void *Key , enum bst_ST
 	return TempNode ;
 }
 
-bool bst_insert( struct bst_Node **RootNode , struct bst_Node *NewNode , enum bst_STATUS ( *judge )( void *Key1 , void *Key2 ) )
+bool plibStdBST_insert( struct plibStdBST_Node **RootNode , struct plibStdBST_Node *NewNode , enum plibStdBST_STATUS ( *judge )( void *Key1 , void *Key2 ) )
 {
-	struct bst_Node *TempNode = *RootNode ;
-	enum bst_STATUS Status ;
+	struct plibStdBST_Node *TempNode = *RootNode ;
+	enum plibStdBST_STATUS Status ;
 
 	while( TempNode != NULL )
 	{
 		Status = judge( NewNode->Key , TempNode->Key ) ;
 		
-		if( Status == bst_status_LESS )
+		if( Status == plibStdBST_status_LESS )
 		{
 			if( TempNode->Left == NULL )
 			{
@@ -43,7 +44,7 @@ bool bst_insert( struct bst_Node **RootNode , struct bst_Node *NewNode , enum bs
 			
 			TempNode = TempNode->Left ;
 		}
-		else if( Status == bst_status_GREAT )
+		else if( Status == plibStdBST_status_GREAT )
 		{
 			if( TempNode->Right == NULL )
 			{
@@ -60,21 +61,21 @@ bool bst_insert( struct bst_Node **RootNode , struct bst_Node *NewNode , enum bs
 	*RootNode = NewNode ;
 	return true ;
 }
-struct bst_Node* bst_desert( struct bst_Node **RootNode , char *Key , enum bst_STATUS ( *judge )( void *Key1 , void *Key2 ) )
+struct plibStdBST_Node* plibStdBST_desert( struct plibStdBST_Node **RootNode , char *Key , enum plibStdBST_STATUS ( *judge )( void *Key1 , void *Key2 ) )
 {
-	struct bst_Node *ChildNode = *RootNode , *ParentNode = ChildNode , *TempParentNode , *TempChildNode ;
-	enum bst_STATUS Status ;
+	struct plibStdBST_Node *ChildNode = *RootNode , *ParentNode = ChildNode , *TempParentNode , *TempChildNode ;
+	enum plibStdBST_STATUS Status ;
 	
 	while( ChildNode != NULL )
 	{
 		Status = judge( Key , ChildNode->Key ) ;
 		
-		if( Status == bst_status_LESS )
+		if( Status == plibStdBST_status_LESS )
 		{
 			ParentNode = ChildNode ;
 			ChildNode = ChildNode->Left ;
 		}
-		else if( Status == bst_status_GREAT )
+		else if( Status == plibStdBST_status_GREAT )
 		{
 			ParentNode = ChildNode ;
 			ChildNode = ChildNode->Right ;
@@ -87,9 +88,9 @@ struct bst_Node* bst_desert( struct bst_Node **RootNode , char *Key , enum bst_S
 					*RootNode = NULL ;
 				else
 				{
-					if( Status == bst_status_LESS )
+					if( Status == plibStdBST_status_LESS )
 						ParentNode->Left = NULL ;
-					else if( Status == bst_status_GREAT )
+					else if( Status == plibStdBST_status_GREAT )
 						ParentNode->Right = NULL ;
 				}
 			}
@@ -99,9 +100,9 @@ struct bst_Node* bst_desert( struct bst_Node **RootNode , char *Key , enum bst_S
 					*RootNode = ( *RootNode )->Left ;
 				else
 				{
-					if( Status == bst_status_LESS )
+					if( Status == plibStdBST_status_LESS )
 						ParentNode->Left = ChildNode->Left ;
-					else if( Status == bst_status_GREAT )
+					else if( Status == plibStdBST_status_GREAT )
 						ParentNode->Right = ChildNode->Left ;
 				}
 			}
@@ -111,9 +112,9 @@ struct bst_Node* bst_desert( struct bst_Node **RootNode , char *Key , enum bst_S
 					*RootNode = ( *RootNode )->Right ;
 				else
 				{
-					if( Status == bst_status_LESS )
+					if( Status == plibStdBST_status_LESS )
 						ParentNode->Left = ChildNode->Right ;
-					else if( Status == bst_status_GREAT )
+					else if( Status == plibStdBST_status_GREAT )
 						ParentNode->Right = ChildNode->Right ;
 				}
 			}
@@ -139,9 +140,9 @@ struct bst_Node* bst_desert( struct bst_Node **RootNode , char *Key , enum bst_S
 					*RootNode = TempChildNode ;
 				else
 				{
-					if( Status == bst_status_LESS )
+					if( Status == plibStdBST_status_LESS )
 						ParentNode->Left = TempChildNode ;
-					else if( Status == bst_status_GREAT )
+					else if( Status == plibStdBST_status_GREAT )
 						ParentNode->Right = TempChildNode ;
 				}
 			}
