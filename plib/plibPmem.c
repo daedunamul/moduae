@@ -2,7 +2,7 @@
 	plib
 	plibPmem
 */
-#include "plibplibPmem.h"
+#include "plibPmem.h"
 
 // node pool
 struct plibPmem_bst_Pool* plibPmem_bst_createPool( uint32_t MaxCount )
