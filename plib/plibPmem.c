@@ -87,7 +87,7 @@ bool plibPmem_manager_insert( struct plibPmem_Manager *Manager , void *Address )
 	NewNode->Left = NULL ;
 	NewNode->Right = NULL ;
 		
-	Flag = bst_insert( &( Manager->RootMemoryNode ) , NewNode , plibPmem_manager_judge ) ;
+	Flag = plibStdBST_insert( &( Manager->RootMemoryNode ) , NewNode , plibPmem_manager_judge ) ;
 	if( Flag == false )
 		free( NewNode ) ;
 	else
@@ -97,7 +97,7 @@ bool plibPmem_manager_insert( struct plibPmem_Manager *Manager , void *Address )
 }
 bool plibPmem_manager_desert( struct plibPmem_Manager *Manager , void *Address )
 {
-	struct plibStdBST_Node *OldNode = bst_desert( &( Manager->RootMemoryNode ) , Address , plibPmem_manager_judge ) ;
+	struct plibStdBST_Node *OldNode = plibStdBST_desert( &( Manager->RootMemoryNode ) , Address , plibPmem_manager_judge ) ;
 	
 	if( OldNode == NULL )
 		return false ;
