@@ -68,7 +68,7 @@ void plibPmem_bst_deallocatePool( struct plibPmem_bst_Pool *Pool , struct plibSt
 }
 
 // manager
-enum plibStdBST_STATUS plibPmem_manager_judge( void *Key1 , void *Key2 )
+enum plibStdBST_Status plibPmem_manager_judge( void *Key1 , void *Key2 )
 {
 	if( Key1 < Key2 )
 		return plibStdBST_status_LESS ;
