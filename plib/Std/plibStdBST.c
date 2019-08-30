@@ -5,10 +5,10 @@
 */
 #include "plibStdBST.h"
 
-struct plibStdBST_Node* plibStdBST_search( struct plibStdBST_Node *RootNode , void *Key , enum plibStdBST_STATUS ( *judge )( void *Key1 , void *Key2 ) )
+struct plibStdBST_Node* plibStdBST_search( struct plibStdBST_Node *RootNode , void *Key , enum plibStdBST_Status ( *judge )( void *Key1 , void *Key2 ) )
 {
 	struct plibStdBST_Node *TempNode = RootNode ;
-	enum plibStdBST_STATUS Status ;
+	enum plibStdBST_Status Status ;
 	
 	while( TempNode != NULL )
 	{
@@ -25,10 +25,10 @@ struct plibStdBST_Node* plibStdBST_search( struct plibStdBST_Node *RootNode , vo
 	return TempNode ;
 }
 
-bool plibStdBST_insert( struct plibStdBST_Node **RootNode , struct plibStdBST_Node *NewNode , enum plibStdBST_STATUS ( *judge )( void *Key1 , void *Key2 ) )
+bool plibStdBST_insert( struct plibStdBST_Node **RootNode , struct plibStdBST_Node *NewNode , enum plibStdBST_Status ( *judge )( void *Key1 , void *Key2 ) )
 {
 	struct plibStdBST_Node *TempNode = *RootNode ;
-	enum plibStdBST_STATUS Status ;
+	enum plibStdBST_Status Status ;
 
 	while( TempNode != NULL )
 	{
@@ -61,10 +61,10 @@ bool plibStdBST_insert( struct plibStdBST_Node **RootNode , struct plibStdBST_No
 	*RootNode = NewNode ;
 	return true ;
 }
-struct plibStdBST_Node* plibStdBST_desert( struct plibStdBST_Node **RootNode , char *Key , enum plibStdBST_STATUS ( *judge )( void *Key1 , void *Key2 ) )
+struct plibStdBST_Node* plibStdBST_desert( struct plibStdBST_Node **RootNode , char *Key , enum plibStdBST_Status ( *judge )( void *Key1 , void *Key2 ) )
 {
 	struct plibStdBST_Node *ChildNode = *RootNode , *ParentNode = ChildNode , *TempParentNode , *TempChildNode ;
-	enum plibStdBST_STATUS Status ;
+	enum plibStdBST_Status Status ;
 	
 	while( ChildNode != NULL )
 	{
