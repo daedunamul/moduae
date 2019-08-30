@@ -25,6 +25,6 @@ struct plibPmem_Manager
 	struct plibStdBST_Node *RootMemoryNode ;
 } ;
 
-enum plibStdBST_STATUS plibPmem_manager_judge( void *Key1 , void *Key2 ) ;
+enum plibStdBST_Status plibPmem_manager_judge( void *Key1 , void *Key2 ) ;
 bool plibPmem_manager_insert( struct plibPmem_Manager *Manager , void *Address ) ;
 bool plibPmem_manager_desert( struct plibPmem_Manager *Manager , void *Address ) ;
