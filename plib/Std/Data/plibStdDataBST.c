@@ -44,7 +44,6 @@ plibStdDataBST_push
 			else
 				return false ;
 		}
-			else
 		while( *ThisNode != NullPointer ) ;
 	}
 	
