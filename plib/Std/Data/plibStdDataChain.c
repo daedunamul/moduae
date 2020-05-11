@@ -3,55 +3,55 @@
 */
 #include "plibStdDataChain.h"
 
-void plibStdDataChain_push( bool Direction , struct plibStdDataChain **TopNode , struct plibStdDataChain *NewNode )
+void plibStdDataChain_push( bool Direction , struct plibStdDataChain **EntryNode , struct plibStdDataChain *NewNode )
 {
-	if( *TopNode == NullPointer )
+	if( *EntryNode == NullPointer )
 	{
 		NewNode->Left = NewNode ;
 		NewNode->Right = NewNode ;
-		*TopNode = NewNode ;
+		*EntryNode = NewNode ;
 	}
 	else
 	{
 		if( Direction )
 		{
 			// Right
-			NewNode->Left = *TopNode ;
-			NewNode->Right = ( *TopNode )->Right ;
+			NewNode->Left = *EntryNode ;
+			NewNode->Right = ( *EntryNode )->Right ;
 		
-			( *TopNode )->Right->Left = NewNode ;
-			( *TopNode )->Right = NewNode ;
+			( *EntryNode )->Right->Left = NewNode ;
+			( *EntryNode )->Right = NewNode ;
 		}
 		else
 		{
 			// Left
-			NewNode->Left = ( *TopNode )->Left ;
-			NewNode->Right = *TopNode ;
+			NewNode->Left = ( *EntryNode )->Left ;
+			NewNode->Right = *EntryNode ;
 		
-			( *TopNode )->Left->Right = NewNode ;
-			( *TopNode )->Left = NewNode ;
+			( *EntryNode )->Left->Right = NewNode ;
+			( *EntryNode )->Left = NewNode ;
 		}
 	}
 }
-struct plibStdDataChain* plibStdDataChain_pop( bool Direction , struct plibStdDataChain **TopNode )
+struct plibStdDataChain* plibStdDataChain_pop( bool Direction , struct plibStdDataChain **EntryNode )
 {
 	struct plibStdDataChain* OldNode ;
 	
-	if( *TopNode == NullPointer )
+	if( *EntryNode == NullPointer )
 		return NullPointer ;
-	else if( ( *TopNode )->Left == ( *TopNode )->Right )
+	else if( ( *EntryNode )->Left == ( *EntryNode )->Right )
 	{
-		OldNode = *TopNode ;
-		*TopNode = NullPointer ;
+		OldNode = *EntryNode ;
+		*EntryNode = NullPointer ;
 	}
 	else
 	{
 		if( Direction )
 			// Right
-			OldNode = ( *TopNode )->Right ;
+			OldNode = ( *EntryNode )->Right ;
 		else
 			// Left
-			OldNode = ( *TopNode )->Left ;
+			OldNode = ( *EntryNode )->Left ;
 		OldNode->Left->Right = OldNode->Right ;
 		OldNode->Right->Left = OldNode->Left ;
 	}
