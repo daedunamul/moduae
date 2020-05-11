@@ -5,7 +5,7 @@
 
 void plibStdDataChain_push( bool Direction , struct plibStdDataChain **EntryNode , struct plibStdDataChain *NewNode )
 {
-	if( *EntryNode == NullPointer )
+	if( *EntryNode == plibStdData_Pointer_Null )
 	{
 		NewNode->Left = NewNode ;
 		NewNode->Right = NewNode ;
@@ -37,12 +37,12 @@ struct plibStdDataChain* plibStdDataChain_pop( bool Direction , struct plibStdDa
 {
 	struct plibStdDataChain* OldNode ;
 	
-	if( *EntryNode == NullPointer )
-		return NullPointer ;
+	if( *EntryNode == plibStdData_Pointer_Null )
+		return plibStdData_Pointer_Null ;
 	else if( ( *EntryNode )->Left == ( *EntryNode )->Right )
 	{
 		OldNode = *EntryNode ;
-		*EntryNode = NullPointer ;
+		*EntryNode = plibStdData_Pointer_Null ;
 	}
 	else
 	{
@@ -58,19 +58,19 @@ struct plibStdDataChain* plibStdDataChain_pop( bool Direction , struct plibStdDa
 	
 	return OldNode ;
 }
-struct plibStdDataChain* plibStdDataChain_lookup( bool Direction , unsigned int Index , struct plibStdDataChain *EntryNode )
+struct plibStdDataChain* plibStdDataChain_lookup( bool Direction , unsigned int Index , struct plibStdDataChain *ThisNode )
 {
 	unsigned int Count ;
 	
-	if( EntryNode == NullPointer )
-		return NullPointer ;
+	if( ThisNode == plibStdData_Pointer_Null )
+		return plibStdData_Pointer_Null ;
 	else
 	{
 		if( Direction )
-			for( Count = 0 ; Count < Index ; Count ++ , EntryNode = EntryNode->Right ) ;
+			for( Count = 0 ; Count < Index ; Count ++ , ThisNode = ThisNode->Right ) ;
 		else
-			for( Count = 0 ; Count < Index ; Count ++ , EntryNode = EntryNode->Left ) ;
+			for( Count = 0 ; Count < Index ; Count ++ , ThisNode = ThisNode->Left ) ;
 	}
 	
-	return EntryNode ;
+	return ThisNode ;
 }
