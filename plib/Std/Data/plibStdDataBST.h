@@ -16,14 +16,14 @@ struct plibStdDataBST
 bool
 plibStdDataBST_push
 (
-	struct plibStdDataBST **RootNode , 
+	struct plibStdDataBST **EntryNode , 
 	struct plibStdDataBST *NewNode , 
 	enum plibStdDataBST_Status ( *Operator )( void *Key1 , void *Key2 ) 
 ) ;
 struct plibStdDataBST*
 plibStdDataBST_pop
 (
-	struct plibStdDataBST **RootNode , 
+	struct plibStdDataBST **EntryNode , 
 	void *Key , 
 	enum plibStdDataBST_Status ( *Operator )( void *Key1 , void *Key2 ) 
 ) ;
