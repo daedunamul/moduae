@@ -6,4 +6,4 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define NullPointer (void *)0
+#define plibStdData_Pointer_Null (void *)0
