@@ -16,7 +16,7 @@ struct plibStdDataBST
 bool
 plibStdDataBST_push
 (
-	struct plibStdDataBST **ThisNode , 
+	struct plibStdDataBST **RootNode , 
 	struct plibStdDataBST *NewNode , 
 	enum plibStdDataBST_Status ( *Operator )( void *Key1 , void *Key2 ) 
 ) ;
