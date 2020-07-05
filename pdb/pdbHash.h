@@ -1,6 +1,7 @@
 /*
 	pdb::Hash
 */
+// 임시로 사용할 예정 ... 나중에 plibCrypto로 이동
 #pragma once
 #include "../plib/plibStdData.h"
 
