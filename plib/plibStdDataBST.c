@@ -8,13 +8,13 @@ plibStdDataBST_push
 (
 	struct plibStdDataBST **EntryNode , 
 	struct plibStdDataBST *NewNode , 
-	enum plibStdDataBST_Status ( *Operator )( void *Key1 , void *Key2 ) 
+	enum plibStdDataBSTStatus ( *Operator )( void *Key1 , void *Key2 ) 
 )
 {
 	struct plibStdDataBST *ThisNode = *EntryNode ;
-	enum plibStdDataBST_Status Status ;
+	enum plibStdDataBSTStatus Status ;
 
-	if( ThisNode == plibStdData_Pointer_Null )
+	if( ThisNode == plibStdTypeNullPointer )
 		*EntryNode = NewNode ;
 	else
 	{
@@ -22,9 +22,9 @@ plibStdDataBST_push
 		{
 			Status = Operator( NewNode->Key , ThisNode->Key ) ;
 		
-			if( Status == plibStdDataBST_Status_Less )
+			if( Status == plibStdDataBSTStatusLess )
 			{
-				if( ThisNode->Left == plibStdData_Pointer_Null )
+				if( ThisNode->Left == plibStdTypeNullPointer )
 				{
 					ThisNode->Left = NewNode ;
 					break ;
@@ -32,9 +32,9 @@ plibStdDataBST_push
 				else
 					ThisNode = ThisNode->Left ;
 			}
-			else if( Status == plibStdDataBST_Status_Great )
+			else if( Status == plibStdDataBSTStatusGreat )
 			{
-				if( ThisNode->Right == plibStdData_Pointer_Null )
+				if( ThisNode->Right == plibStdTypeNullPointer )
 				{
 					ThisNode->Right = NewNode ;
 					break ;
@@ -45,7 +45,7 @@ plibStdDataBST_push
 			else
 				return false ;
 		}
-		while( ThisNode != plibStdData_Pointer_Null ) ;
+		while( ThisNode != plibStdTypeNullPointer ) ;
 	}
 	
 	return true ;
@@ -55,55 +55,55 @@ plibStdDataBST_pop
 (
 	struct plibStdDataBST **EntryNode , 
 	void *Key , 
-	enum plibStdDataBST_Status ( *Operator )( void *Key1 , void *Key2 ) 
+	enum plibStdDataBSTStatus ( *Operator )( void *Key1 , void *Key2 ) 
 )
 {
-	struct plibStdDataBST *ThisNode = *EntryNode , *CandidateNode , *CandidateParent = plibStdData_Pointer_Null , **ParentPointer = plibStdData_Pointer_Null ;
-	enum plibStdDataBST_Status Status ;
+	struct plibStdDataBST *ThisNode = *EntryNode , *CandidateNode , *CandidateParent = plibStdTypeNullPointer , **ParentPointer = plibStdTypeNullPointer ;
+	enum plibStdDataBSTStatus Status ;
 	
-	while( ThisNode != plibStdData_Pointer_Null )
+	while( ThisNode != plibStdTypeNullPointer )
 	{
 		Status = Operator( Key , ThisNode->Key ) ;
 		
-		if( Status == plibStdDataBST_Status_Less )
+		if( Status == plibStdDataBSTStatusLess )
 		{
 			ParentPointer = &( ThisNode->Left ) ;
 			ThisNode = ThisNode->Left ;
 		}
-		else if( Status == plibStdDataBST_Status_Great )
+		else if( Status == plibStdDataBSTStatusGreat )
 		{
 			ParentPointer = &( ThisNode->Right ) ;
 			ThisNode = ThisNode->Right ;
 		}
 		else
 		{
-			if( ThisNode->Left != plibStdData_Pointer_Null && ThisNode->Right != plibStdData_Pointer_Null )
+			if( ThisNode->Left != plibStdTypeNullPointer && ThisNode->Right != plibStdTypeNullPointer )
 			{
 				for
 				( 
 					CandidateNode = ThisNode->Right ; 
-					CandidateNode->Left != plibStdData_Pointer_Null ; 
+					CandidateNode->Left != plibStdTypeNullPointer ; 
 					CandidateParent = CandidateNode , CandidateNode = CandidateNode->Left 
 				) ;
 				
-				if( CandidateParent != plibStdData_Pointer_Null )
+				if( CandidateParent != plibStdTypeNullPointer )
 					CandidateParent->Left = CandidateNode->Right ;
 					
 				CandidateNode->Left = ThisNode->Left ;
 				if( ThisNode->Right != CandidateNode )
 					CandidateNode->Right = ThisNode->Right ;
 				
-				if( ParentPointer == plibStdData_Pointer_Null )
+				if( ParentPointer == plibStdTypeNullPointer )
 					*EntryNode = CandidateNode ;
 				else
 					*ParentPointer = CandidateNode ;
 			}
 			else
 			{
-				if( ParentPointer == plibStdData_Pointer_Null )
-					*EntryNode = ThisNode->Left != plibStdData_Pointer_Null ? ThisNode->Left : ThisNode->Right ;
+				if( ParentPointer == plibStdTypeNullPointer )
+					*EntryNode = ThisNode->Left != plibStdTypeNullPointer ? ThisNode->Left : ThisNode->Right ;
 				else
-					*ParentPointer = ThisNode->Left != plibStdData_Pointer_Null ? ThisNode->Left : ThisNode->Right ;
+					*ParentPointer = ThisNode->Left != plibStdTypeNullPointer ? ThisNode->Left : ThisNode->Right ;
 			}
 			
 			break ;
@@ -117,18 +117,18 @@ plibStdDataBST_lookup
 (
 	struct plibStdDataBST *ThisNode , 
 	void *Key , 
-	enum plibStdDataBST_Status ( *Operator )( void *Key1 , void *Key2 ) 
+	enum plibStdDataBSTStatus ( *Operator )( void *Key1 , void *Key2 ) 
 )
 {
-	enum plibStdDataBST_Status Status ;
+	enum plibStdDataBSTStatus Status ;
 	
-	while( ThisNode != plibStdData_Pointer_Null )
+	while( ThisNode != plibStdTypeNullPointer )
 	{
 		Status = Operator( Key , ThisNode->Key ) ;
 		
-		if( Status == plibStdDataBST_Status_Less )
+		if( Status == plibStdDataBSTStatusLess )
 			ThisNode = ThisNode->Left ;
-		else if( Status == plibStdDataBST_Status_Great )
+		else if( Status == plibStdDataBSTStatusGreat )
 			ThisNode = ThisNode->Right ;
 		else
 			break ;
