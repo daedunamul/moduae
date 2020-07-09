@@ -2,9 +2,9 @@
 	plib::Std::Data::BST
 */
 #pragma once
-#include "plibStdData.h"
+#include "plibStdType.h"
 
-enum plibStdDataBST_Status { plibStdDataBST_Status_Less , plibStdDataBST_Status_Great , plibStdDataBST_Status_Equal } ;
+enum plibStdDataBSTStatus { plibStdDataBSTStatusLess , plibStdDataBSTStatusGreat , plibStdDataBSTStatusEqual } ;
 
 struct plibStdDataBST
 {
@@ -18,19 +18,19 @@ plibStdDataBST_push
 (
 	struct plibStdDataBST **EntryNode , 
 	struct plibStdDataBST *NewNode , 
-	enum plibStdDataBST_Status ( *Operator )( void *Key1 , void *Key2 ) 
+	enum plibStdDataBSTStatus ( *Operator )( void *Key1 , void *Key2 ) 
 ) ;
 struct plibStdDataBST*
 plibStdDataBST_pop
 (
 	struct plibStdDataBST **EntryNode , 
 	void *Key , 
-	enum plibStdDataBST_Status ( *Operator )( void *Key1 , void *Key2 ) 
+	enum plibStdDataBSTStatus ( *Operator )( void *Key1 , void *Key2 ) 
 ) ;
 struct plibStdDataBST*
 plibStdDataBST_lookup
 (
 	struct plibStdDataBST *ThisNode , 
 	void *Key , 
-	enum plibStdDataBST_Status ( *Operator )( void *Key1 , void *Key2 ) 
+	enum plibStdDataBSTStatus ( *Operator )( void *Key1 , void *Key2 ) 
 ) ;
