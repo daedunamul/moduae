@@ -5,7 +5,7 @@
 
 void plibStdDataChain_push( bool Direction , struct plibStdDataChain **EntryNode , struct plibStdDataChain *NewNode )
 {
-	if( *EntryNode == plibStdData_Pointer_Null )
+	if( *EntryNode == plibStdTypeNullPointer )
 	{
 		NewNode->Left = NewNode ;
 		NewNode->Right = NewNode ;
@@ -37,12 +37,12 @@ struct plibStdDataChain* plibStdDataChain_pop( bool Direction , struct plibStdDa
 {
 	struct plibStdDataChain* OldNode ;
 	
-	if( *EntryNode == plibStdData_Pointer_Null )
-		return plibStdData_Pointer_Null ;
+	if( *EntryNode == plibStdTypeNullPointer )
+		return plibStdTypeNullPointer ;
 	else if( ( *EntryNode )->Left == ( *EntryNode )->Right )
 	{
 		OldNode = *EntryNode ;
-		*EntryNode = plibStdData_Pointer_Null ;
+		*EntryNode = plibStdTypeNullPointer ;
 	}
 	else
 	{
@@ -62,8 +62,8 @@ struct plibStdDataChain* plibStdDataChain_lookup( bool Direction , unsigned int 
 {
 	unsigned int Count ;
 	
-	if( ThisNode == plibStdData_Pointer_Null )
-		return plibStdData_Pointer_Null ;
+	if( ThisNode == plibStdTypeNullPointer )
+		return plibStdTypeNullPointer ;
 	else
 	{
 		if( Direction )
