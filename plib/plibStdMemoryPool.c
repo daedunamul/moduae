@@ -36,7 +36,7 @@ struct plibStdMemoryPool* plibStdMemoryPool_createPool( size_t UnitSize , size_t
 }
 bool plibStdMemoryPool_deletePool( struct plibStdMemoryPool **Pool )
 {
-	if( *Pool == plibStdTypeNullPointer )
+	if( *Pool == plibStdTypeNullPointer || ( *Pool )->MaxCount == 0 )
 		return false ;
 		
 	free( ( *Pool )->AddressStack ) ;
