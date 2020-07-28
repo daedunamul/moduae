@@ -9,6 +9,7 @@ enum plibStdDataBSTStatus { plibStdDataBSTStatusLess , plibStdDataBSTStatusGreat
 struct plibStdDataBST
 {
 	uint8_t *Key ;
+	uint8_t Type ;
 	uint8_t *Value ;
 	struct plibStdDataBST *Left , *Right ;
 } ;
