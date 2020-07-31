@@ -20,7 +20,7 @@ struct emptydbDB* emptydbDB_createDB( size_t ObjectMaxCount , size_t KeyValueMax
 	NewDB->ObjectThisNode = plibStdTypeNullPointer ;
 	NewDB->ObjectNodePool = plibStdMemoryPool_createPool
 	(
-		sizeof( struct emptydbDB ) + sizeof( emptydbCommonKeyType ) + sizeof( struct emptydbDBObjectValueType ) ,
+		sizeof( struct emptydbDB ) + sizeof( emptydbCommonKeyType ) + sizeof( struct emptydbCommonObjectValueType ) ,
 		ObjectMaxCount
 	) ;
 	NewDB->KeyValueNodePool = plibStdMemoryPool_createPool
