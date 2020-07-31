@@ -2,10 +2,7 @@
 	emptydb::DB
 */
 #pragma once
-#include "../plib/plibStdDataBST.h"
-#include "../plib/plibStdMemoryPool.h"
-
-typedef uint32_t emptydbDBKeyType ;
+#include "emptydbCommon.h"
 
 struct emptydbDB
 {
