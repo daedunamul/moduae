@@ -1,5 +1,5 @@
 /*
-	emptydb::Type
+	emptydb::Common
 */
 #pragma once
 #include "../plib/plibStdDataBST.h"
