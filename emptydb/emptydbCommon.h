@@ -11,3 +11,5 @@ struct emptydbCommonObjectValueType
 {
 	struct plibStdDataBST *MemberObjectRootNode , *MemberKeyValueRootNode ;
 } ;
+
+enum plibStdDataBSTStatus emptydbCommon_compareKey( uint8_t *Key1 , uint8_t *Key2 ) ;
