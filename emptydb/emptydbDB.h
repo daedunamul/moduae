@@ -11,10 +11,5 @@ struct emptydbDB
 	struct plibStdMemoryPool *ObjectNodePool , *KeyValueNodePool ;
 } ;
 
-struct emptydbDBObjectValueType
-{
-	struct plibStdDataBST *MemberObjectRootNode , *MemberKeyValueRootNode ;
-} ;
-
 struct emptydbDB* emptydbDB_createDB( size_t ObjectMaxCount , size_t KeyValueMaxCount ) ;
 bool emptydbDB_deleteDB( struct emptydbDB **DB ) ;
