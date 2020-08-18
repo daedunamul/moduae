@@ -5,7 +5,7 @@
 
 struct emptydbRoot* emptydbRoot_create( size_t ObjectMaxCount , size_t KeyValueMaxCount )
 {
-	if( ObjectMaxCount <= 0 || KeyValueMaxCount <= 0 )
+	if( ObjectMaxCount == 0 || KeyValueMaxCount == 0 )
 		return plibStdTypeNullPointer ;
 		
 	struct emptydbRoot *NewRoot = ( struct emptydbRoot* )malloc( sizeof( struct emptydbRoot ) ) ;
