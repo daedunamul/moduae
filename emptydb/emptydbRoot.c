@@ -18,6 +18,7 @@ struct emptydbRoot* emptydbRoot_create( size_t ObjectMaxCount , size_t KeyValueM
 	NewRoot->KeyValueCount = 0 ;
 	NewRoot->ObjectRootNode = plibStdTypeNullPointer ;
 	NewRoot->ObjectThisNode = plibStdTypeNullPointer ;
+	NewRoot->KeyValueThisNode = plibStdTypeNullPointer ;
 	NewRoot->ObjectNodePool = plibStdMemoryPool_createPool
 	(
 		sizeof( struct plibStdDataBST ) + sizeof( emptydbCommonKeyType ) + sizeof( struct emptydbCommonObjectValueType ) ,
@@ -25,7 +26,7 @@ struct emptydbRoot* emptydbRoot_create( size_t ObjectMaxCount , size_t KeyValueM
 	) ;
 	NewRoot->KeyValueNodePool = plibStdMemoryPool_createPool
 	( 
-		sizeof( struct plibStdDataBST ) + sizeof( emptydbCommonKeyType ) ,
+		sizeof( struct plibStdDataBST ) + sizeof( emptydbCommonKeyType ) + sizeof( struct emptydbCommonKeyValueType ) ,
 		KeyValueMaxCount
 	) ;
 	
