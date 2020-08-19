@@ -56,6 +56,19 @@ bool emptydbKeyValue_deleteKeyValue( struct emptydbRoot *Root , size_t KeyCount 
 	
 	return true ;
 }
+void emptydbKeyValue_flushKeyValue( struct emptydbRoot *Root , struct plibStdDataBST *KeyValueEntryNode )
+{
+	if( Root == plibStdTypeNullPointer || KeyValueEntryNode == plibStdTypeNullPointer )
+		return ;
+	
+	if( KeyValueEntryNode->Left != plibStdTypeNullPointer )
+		emptydbKeyValue_flushKeyValue( Root , KeyValueEntryNode->Left ) ;
+	else if( KeyValueEntryNode->Right != plibStdTypeNullPointer )
+		emptydbKeyValue_flushKeyValue( Root , KeyValueEntryNode->Right ) ;
+		
+	plbStdMemoryPool_deallocate( Root->KeyValueNodePool , ( uint8_t** )( &KeyValueEntryNode ) ) ;
+	Root->KeyValueCount -- ;
+}
 
 size_t emptydbKeyValue_lookupKeyValue( struct emptydbRoot *Root , size_t KeyCount , emptydbCommonKeyType *KeyArray , struct plibStdDataBST **ResultKeyValueArray )
 {
