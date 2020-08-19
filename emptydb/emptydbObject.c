@@ -102,6 +102,7 @@ void emptydbObject_flushObject( struct emptydbRoot *Root , struct plibStdDataBST
 	else if( TempObjectNode->Right != plibStdTypeNullPointer )
 		emptydbObject_flushObject( Root , TempObjectNode->Right ) ;
 	
+	emptydbKeyValue_flushKeyValue( Root , ( ( struct emptydbCommonObjectValueType* )TempObjectNode->Value )->MemberKeyValueRootNode ) ;
 	plbStdMemoryPool_deallocate( Root->ObjectNodePool , ( uint8_t** )( &TempObjectNode ) ) ;
 	Root->ObjectCount -- ;
 }
