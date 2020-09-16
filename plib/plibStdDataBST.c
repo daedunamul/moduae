@@ -21,7 +21,7 @@ plibStdDataBST_push
 		do
 		{
 			Status = Operator( NewNode->Key , ThisNode->Key ) ;
-		
+			
 			if( Status == plibStdDataBSTStatusLess )
 			{
 				if( ThisNode->Left == plibStdTypeNullPointer )
