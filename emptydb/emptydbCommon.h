@@ -6,6 +6,7 @@
 #include "../plib/plibStdMemoryPool.h"
 
 typedef uint32_t emptydbCommonKeyType ;
+typedef uint32_t emptydbCommonCountType ;
 
 struct emptydbCommonObjectValueType
 {
@@ -14,7 +15,7 @@ struct emptydbCommonObjectValueType
 
 struct emptydbCommonKeyValueType
 {
-	size_t DataSize , DataLength ;
+	emptydbCommonCountType DataSize , DataLength ;
 	uint8_t *Data ;
 } ;
 
