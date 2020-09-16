@@ -3,7 +3,7 @@
 */
 #include "emptydbRoot.h"
 
-struct emptydbRoot* emptydbRoot_create( size_t ObjectMaxCount , size_t KeyValueMaxCount )
+struct emptydbRoot* emptydbRoot_create( emptydbCommonCountType ObjectMaxCount , emptydbCommonCountType KeyValueMaxCount )
 {
 	if( ObjectMaxCount == 0 || KeyValueMaxCount == 0 )
 		return plibStdTypeNullPointer ;
@@ -16,9 +16,6 @@ struct emptydbRoot* emptydbRoot_create( size_t ObjectMaxCount , size_t KeyValueM
 	NewRoot->ObjectCount = 0 ;
 	NewRoot->KeyValueMaxCount = KeyValueMaxCount ;
 	NewRoot->KeyValueCount = 0 ;
-	NewRoot->ObjectRootNode = plibStdTypeNullPointer ;
-	NewRoot->ObjectThisNode = plibStdTypeNullPointer ;
-	NewRoot->KeyValueThisNode = plibStdTypeNullPointer ;
 	NewRoot->ObjectNodePool = plibStdMemoryPool_createPool
 	(
 		sizeof( struct plibStdDataBST ) + sizeof( emptydbCommonKeyType ) + sizeof( struct emptydbCommonObjectValueType ) ,
@@ -29,6 +26,9 @@ struct emptydbRoot* emptydbRoot_create( size_t ObjectMaxCount , size_t KeyValueM
 		sizeof( struct plibStdDataBST ) + sizeof( emptydbCommonKeyType ) + sizeof( struct emptydbCommonKeyValueType ) ,
 		KeyValueMaxCount
 	) ;
+	NewRoot->ObjectRootNode = plibStdTypeNullPointer ;
+	NewRoot->ObjectThisNode = plibStdTypeNullPointer ;
+	NewRoot->KeyValueThisNode = plibStdTypeNullPointer ;
 	
 	return NewRoot ;
 }
