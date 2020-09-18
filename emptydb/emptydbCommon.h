@@ -10,12 +10,13 @@ typedef uint32_t emptydbCommonCountType ;
 
 struct emptydbCommonObjectValueType
 {
-	struct plibStdDataBST *MemberObjectRootNode , *MemberKeyValueRootNode ;
+	struct plibStdDataBST *MemberObjectGenesisNode , *MemberPropertGenesisNode ;
 } ;
 
-struct emptydbCommonKeyValueType
+struct emptydbCommonPropertyValueType
 {
 	emptydbCommonCountType DataSize , DataLength ;
+	uint8_t DataType ;
 	uint8_t *Data ;
 } ;
 

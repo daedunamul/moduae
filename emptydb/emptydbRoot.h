@@ -6,10 +6,10 @@
 
 struct emptydbRoot
 {
-	emptydbCommonCountType ObjectMaxCount , ObjectCount , KeyValueMaxCount , KeyValueCount ;
-	struct plibStdMemoryPool *ObjectNodePool , *KeyValueNodePool ;
-	struct plibStdDataBST *ObjectRootNode , *ObjectThisNode , *KeyValueThisNode ;
+	emptydbCommonCountType ObjectMaxCount , ObjectCount , PropertyMaxCount , PropertyCount ;
+	struct plibStdMemoryPool *ObjectNodePool , *PropertyNodePool ;
+	struct plibStdDataBST *ObjectGenesisNode , *ObjectThisNode , *PropertyThisNode ;
 } ;
 
-struct emptydbRoot* emptydbRoot_create( emptydbCommonCountType ObjectMaxCount , emptydbCommonCountType KeyValueMaxCount ) ;
+struct emptydbRoot* emptydbRoot_create( emptydbCommonCountType ObjectMaxCount , emptydbCommonCountType PropertyMaxCount ) ;
 bool emptydbRoot_delete( struct emptydbRoot **Root ) ;
