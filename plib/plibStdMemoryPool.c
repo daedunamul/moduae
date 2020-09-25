@@ -47,7 +47,7 @@ bool plibStdMemoryPool_deletePool( struct plibStdMemoryPool **Pool )
 	return true ;
 }
 
-uint8_t* plbStdMemoryPool_allocate( struct plibStdMemoryPool *Pool )
+plibStdTypeAddress plbStdMemoryPool_allocate( struct plibStdMemoryPool *Pool )
 {
 	if( Pool == plibStdTypeNullPointer || Pool->Count == 0 )
 		return plibStdTypeNullPointer ;
