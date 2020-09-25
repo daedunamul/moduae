@@ -7,7 +7,7 @@
 struct plibStdDataChain
 {
 	struct plibStdDataChain *Left , *Right ;
-	uint8_t *Value ;
+	plibStdTypeAddress *Value ;
 } ;
 
 void plibStdDataChain_push( bool Direction , struct plibStdDataChain **EntryNode , struct plibStdDataChain *NewNode ) ;

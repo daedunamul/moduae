@@ -8,7 +8,7 @@ void plbStdMemoryPool_initialize( struct plibStdMemoryPool *Pool )
 	if( Pool == plibStdTypeNullPointer )
 		return ;
 		
-	uint8_t *Address ;
+	plibStdTypeAddress Address ;
 	
 	for( Pool->Count = 0 ; Pool->Count < Pool->MaxCount ; Pool->Count ++ )
 	{
@@ -18,7 +18,7 @@ void plbStdMemoryPool_initialize( struct plibStdMemoryPool *Pool )
 	}
 }
 
-struct plibStdMemoryPool* plibStdMemoryPool_createPool( size_t UnitSize , size_t MaxCount )
+struct plibStdMemoryPool* plibStdMemoryPool_createPool( plibStdTypeCount UnitSize , plibStdTypeCount MaxCount )
 {
 	if( UnitSize == 0 || MaxCount == 0 )
 		return plibStdTypeNullPointer ;
@@ -27,9 +27,9 @@ struct plibStdMemoryPool* plibStdMemoryPool_createPool( size_t UnitSize , size_t
 
 	NewPool->UnitSize = UnitSize ;
 	NewPool->MaxCount = MaxCount ;
-	NewPool->AddressStart = ( uint8_t* )malloc( ( 1 + UnitSize ) * MaxCount ) ;
+	NewPool->AddressStart = ( plibStdTypeAddress )malloc( ( 1 + UnitSize ) * MaxCount ) ;
 	NewPool->AddressEnd = NewPool->AddressStart + ( 1 + UnitSize ) * ( MaxCount - 1 ) ;
-	NewPool->AddressStack = ( uint8_t** )malloc( sizeof( uint8_t* ) * MaxCount ) ;
+	NewPool->AddressStack = ( plibStdTypeAddress* )malloc( sizeof( plibStdTypeAddress ) * MaxCount ) ;
 	plbStdMemoryPool_initialize( NewPool ) ;
 	
 	return NewPool ;
@@ -57,7 +57,7 @@ uint8_t* plbStdMemoryPool_allocate( struct plibStdMemoryPool *Pool )
 	
 	return Pool->AddressStack[ Pool->Count ] + 1 ;
 }
-void plbStdMemoryPool_deallocate( struct plibStdMemoryPool *Pool , uint8_t **UsedAddress )
+void plbStdMemoryPool_deallocate( struct plibStdMemoryPool *Pool , plibStdTypeAddress *UsedAddress )
 {
 	if
 	(

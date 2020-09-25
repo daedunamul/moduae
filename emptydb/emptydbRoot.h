@@ -2,7 +2,7 @@
 	emptydb::Root
 */
 #pragma once
-#include "emptydbCommon.h"
+#include "emptydbStream.h"
 
 struct emptydbRoot
 {

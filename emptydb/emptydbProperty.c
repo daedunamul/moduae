@@ -3,87 +3,95 @@
 */
 #include "emptydbProperty.h"
 
-bool emptydbKeyValue_createKeyValue( struct emptydbRoot *Root , emptydbCommonCountType KeyCount , emptydbCommonKeyType *KeyArray , emptydbCommonCountType DataSize , emptydbCommonCountType DataLength )
+bool emptydbProperty_create( struct emptydbRoot *Root , uint8_t *Stream )
 {
-	if( Root == plibStdTypeNullPointer || Root->ObjectThisNode == plibStdTypeNullPointer || KeyCount == 0 || KeyArray == plibStdTypeNullPointer || DataSize == 0 || DataLength == 0 )
+	if( Root == plibStdTypeNullPointer || Root->ObjectThisNode == plibStdTypeNullPointer )
 		return false ;
-	
+		
 	emptydbCommonCountType Index ;
 	uint8_t *NewMemory ;
-	struct plibStdDataBST *NewKeyValueNode ;
-	struct emptydbCommonKeyValueType *NewValue ;
+	struct plibStdDataBST *NewPropertyNode ;
+	struct emptydbCommonPropertyValueType *NewValue ;
 	
-	for( Index = 0 ; Index < KeyCount ; Index ++ )
+	for( Index = 0 ; Index < emptydbStream_getTag( Stream , false ) ; Index ++ )
 	{
-		NewMemory = plbStdMemoryPool_allocate( Root->KeyValueNodePool ) ;
-		NewKeyValueNode = ( struct plibStdDataBST* )NewMemory ;
-		NewKeyValueNode->Key = NewMemory + sizeof( struct plibStdDataBST ) ;
-		*( emptydbCommonKeyType* )NewKeyValueNode->Key = KeyArray[ Index ] ;
-		NewKeyValueNode->Type = emptydbCommonNodeTypeKeyValue ;
-		NewKeyValueNode->Value = NewMemory + sizeof( struct plibStdDataBST ) + sizeof( emptydbCommonKeyType ) ; ;
-		NewKeyValueNode->Left = plibStdTypeNullPointer ;
-		NewKeyValueNode->Right = plibStdTypeNullPointer ;
-
-		NewValue = ( struct emptydbCommonKeyValueType* )NewKeyValueNode->Value ;
-		NewValue->DataSize = DataSize ;
-		NewValue->DataLength = DataLength ;
-		//NewValue->Data = plibStdTypeNullPointer ;
+		NewMemory = plbStdMemoryPool_allocate( Root->PropertyNodePool ) ;
+		NewPropertyNode = emptydbCommon_referNode( NewMemory ) ;
+		NewPropertyNode->Key = emptydbCommon_referKey( NewMemory ) ;
+		NewPropertyNode->Value = emptydbCommon_referValue( NewMemory ) ;
 		
-		if( plibStdDataBST_push( &( ( struct emptydbCommonObjectValueType* )Root->ObjectThisNode->Value )->MemberKeyValueRootNode , NewKeyValueNode , emptydbCommon_compareKey ) )
-			Root->KeyValueCount ++ ;
+		*( emptydbCommonKeyType* )NewPropertyNode->Key = *( emptydbCommonKeyType* )emptydbStream_pointData( Stream , Index ) ;
+		NewPropertyNode->Left = plibStdTypeNullPointer ;
+		NewPropertyNode->Right = plibStdTypeNullPointer ;
+		
+		NewValue = ( struct emptydbCommonPropertyValueType* )NewPropertyNode->Value ;
+		NewValue->DataType = 0 ;
+		NewValue->DataSize = 0 ;
+		NewValue->DataLength = 0 ;
+		NewValue->Data = plibStdTypeNullPointer ;
+		
+		if( plibStdDataBST_push( &( ( struct emptydbCommonObjectValueType* )Root->ObjectThisNode->Value )->MemberPropertyGenesisNode , NewPropertyNode , emptydbCommon_compareKey ) )
+			Root->PropertyCount ++ ;
 		else
-			plbStdMemoryPool_deallocate( Root->KeyValueNodePool , &NewMemory ) ;
+			plbStdMemoryPool_deallocate( Root->PropertyNodePool , &NewMemory ) ;
 	}
 	
 	return true ;
 }
-bool emptydbKeyValue_deleteKeyValue( struct emptydbRoot *Root , emptydbCommonCountType KeyCount , emptydbCommonKeyType *KeyArray )
+bool emptydbProperty_delete( struct emptydbRoot *Root , uint8_t *Stream )
 {
-	if( Root == plibStdTypeNullPointer || Root->ObjectThisNode == plibStdTypeNullPointer || KeyCount == 0 || KeyArray == plibStdTypeNullPointer )
+	if( Root == plibStdTypeNullPointer || Root->ObjectThisNode == plibStdTypeNullPointer )
 		return false ;
 	
 	emptydbCommonCountType Index ;
-	struct plibStdDataBST *KeyValueNode ;
+	struct plibStdDataBST *PropertyNode ;
 	
-	for( Index = 0 ; Index < KeyCount ; Index ++ )
+	for( Index = 0 ; Index < emptydbStream_getTag( Stream , false ) ; Index ++ )
 	{
-		KeyValueNode = plibStdDataBST_pop( &( ( struct emptydbCommonObjectValueType* )Root->ObjectThisNode->Value )->MemberKeyValueRootNode , ( uint8_t* )( KeyArray + Index ) , emptydbCommon_compareKey ) ;
-		if( KeyValueNode == plibStdTypeNullPointer )
+		PropertyNode = plibStdDataBST_pop( &( ( struct emptydbCommonObjectValueType* )Root->ObjectThisNode->Value )->MemberPropertyGenesisNode , emptydbStream_pointData( Stream , Index ) , emptydbCommon_compareKey ) ;
+		if( PropertyNode == plibStdTypeNullPointer )
 			continue ;
-		plbStdMemoryPool_deallocate( Root->KeyValueNodePool , ( uint8_t** )( &KeyValueNode ) ) ;
-		Root->KeyValueCount -- ;
+		
+		plbStdMemoryPool_deallocate( Root->PropertyNodePool , ( uint8_t** )( &PropertyNode ) ) ;
+		Root->PropertyCount -- ;
 	}
 	
 	return true ;
 }
-void emptydbKeyValue_flushKeyValue( struct emptydbRoot *Root , struct plibStdDataBST *KeyValueEntryNode )
+void emptydbProperty_flush( struct emptydbRoot *Root , struct plibStdDataBST *PropertyEntryNode )
 {
-	if( Root == plibStdTypeNullPointer || KeyValueEntryNode == plibStdTypeNullPointer )
+	if( Root == plibStdTypeNullPointer || PropertyEntryNode == plibStdTypeNullPointer )
 		return ;
 	
-	if( KeyValueEntryNode->Left != plibStdTypeNullPointer )
-		emptydbKeyValue_flushKeyValue( Root , KeyValueEntryNode->Left ) ;
-	else if( KeyValueEntryNode->Right != plibStdTypeNullPointer )
-		emptydbKeyValue_flushKeyValue( Root , KeyValueEntryNode->Right ) ;
+	if( PropertyEntryNode->Left != plibStdTypeNullPointer )
+		emptydbProperty_flush( Root , PropertyEntryNode->Left ) ;
+	else if( PropertyEntryNode->Right != plibStdTypeNullPointer )
+		emptydbProperty_flush( Root , PropertyEntryNode->Right ) ;
 		
-	plbStdMemoryPool_deallocate( Root->KeyValueNodePool , ( uint8_t** )( &KeyValueEntryNode ) ) ;
-	Root->KeyValueCount -- ;
+	plbStdMemoryPool_deallocate( Root->PropertyNodePool , ( uint8_t** )( &PropertyEntryNode ) ) ;
+	Root->PropertyCount -- ;
 }
 
-emptydbCommonCountType emptydbKeyValue_lookupKeyValue( struct emptydbRoot *Root , emptydbCommonCountType KeyCount , emptydbCommonKeyType *KeyArray , struct plibStdDataBST **ResultKeyValueArray )
+emptydbCommonCountType emptydbProperty_lookup( struct emptydbRoot *Root , uint8_t *InputStream , uint8_t *OutputStream )
 {
-	if( Root == plibStdTypeNullPointer || Root->ObjectThisNode == plibStdTypeNullPointer || KeyCount == 0 || KeyArray == plibStdTypeNullPointer )
+	if( Root == plibStdTypeNullPointer || Root->ObjectThisNode == plibStdTypeNullPointer )
 		return 0 ;
 		
 	emptydbCommonCountType Index , Count ;
-	struct plibStdDataBST *KeyValueRootNode = ( ( struct emptydbCommonObjectValueType* )Root->ObjectThisNode->Value )->MemberKeyValueRootNode , *KeyValueThisNode ;
+	struct plibStdDataBST *PropertThisNode ;
 	
-	for( Index = 0 , Count = 0 ; Index < KeyCount ; Index ++ )
+	for( Index = 0 , Count = 0 ; Index < emptydbStream_getTag( InputStream , false ) ; Index ++ )
 	{
-		KeyValueThisNode = plibStdDataBST_lookup( KeyValueRootNode , ( uint8_t* )( KeyArray + Index ) , emptydbCommon_compareKey ) ;
-		if( KeyValueThisNode == plibStdTypeNullPointer )
+		PropertThisNode = plibStdDataBST_lookup
+		( 
+			( ( struct emptydbCommonObjectValueType* )Root->ObjectThisNode->Value )->MemberPropertyGenesisNode , 
+			emptydbStream_pointData( InputStream , Index ) , 
+			emptydbCommon_compareKey 
+		) ;
+		if( PropertThisNode == plibStdTypeNullPointer )
 			continue ;
-		ResultKeyValueArray[ Count ] = KeyValueThisNode ;
+			
+		*( struct plibStdDataBST** )( emptydbStream_pointData( OutputStream , Count ) ) = PropertThisNode ;
 		Count ++ ;
 	}
 	
