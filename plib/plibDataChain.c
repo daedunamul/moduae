@@ -1,11 +1,11 @@
 /*
-	plib::Std::Data::Chain
+	plib::Data::Chain
 */
-#include "plibStdDataChain.h"
+#include "plibDataChain.h"
 
-void plibStdDataChain_push( bool Direction , struct plibStdDataChain **EntryNode , struct plibStdDataChain *NewNode )
+void plibDataChain_push( bool Direction , struct plibDataChain **EntryNode , struct plibDataChain *NewNode )
 {
-	if( *EntryNode == plibStdTypeNullPointer )
+	if( *EntryNode == plibCommonNullPointer )
 	{
 		NewNode->Left = NewNode ;
 		NewNode->Right = NewNode ;
@@ -33,16 +33,16 @@ void plibStdDataChain_push( bool Direction , struct plibStdDataChain **EntryNode
 		}
 	}
 }
-struct plibStdDataChain* plibStdDataChain_pop( bool Direction , struct plibStdDataChain **EntryNode )
+struct plibDataChain* plibDataChain_pop( bool Direction , struct plibDataChain **EntryNode )
 {
-	struct plibStdDataChain* OldNode ;
+	struct plibDataChain* OldNode ;
 	
-	if( *EntryNode == plibStdTypeNullPointer )
-		return plibStdTypeNullPointer ;
+	if( *EntryNode == plibCommonNullPointer )
+		return plibCommonNullPointer ;
 	else if( ( *EntryNode )->Left == ( *EntryNode )->Right )
 	{
 		OldNode = *EntryNode ;
-		*EntryNode = plibStdTypeNullPointer ;
+		*EntryNode = plibCommonNullPointer ;
 	}
 	else
 	{
@@ -58,12 +58,12 @@ struct plibStdDataChain* plibStdDataChain_pop( bool Direction , struct plibStdDa
 	
 	return OldNode ;
 }
-struct plibStdDataChain* plibStdDataChain_lookup( bool Direction , unsigned int Index , struct plibStdDataChain *ThisNode )
+struct plibDataChain* plibDataChain_lookup( bool Direction , unsigned int Index , struct plibDataChain *ThisNode )
 {
 	unsigned int Count ;
 	
-	if( ThisNode == plibStdTypeNullPointer )
-		return plibStdTypeNullPointer ;
+	if( ThisNode == plibCommonNullPointer )
+		return plibCommonNullPointer ;
 	else
 	{
 		if( Direction )

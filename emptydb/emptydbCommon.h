@@ -2,8 +2,8 @@
 	emptydb::Common
 */
 #pragma once
-#include "../plib/plibStdDataBST.h"
-#include "../plib/plibStdMemoryPool.h"
+#include "../plib/plibDataHBST.h"
+#include "../plib/plibMemoryPool.h"
 
 typedef uint32_t emptydbCommonKeyType ;
 typedef uint32_t emptydbCommonCountType ;

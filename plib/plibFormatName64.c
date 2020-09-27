@@ -1,9 +1,9 @@
 /*
-	plib::Std::Format::Name64
+	plib::Format::Name64
 */
-#include "plibStdFormatName64.h"
+#include "plibFormatName64.h"
 
-uint8_t plibStdFormatName64_translateFromAscii( char Ascii )
+uint8_t plibFormatName64_translateFromAscii( char Ascii )
 {
 	if( Ascii >= 65 && Ascii <= 90 )
 		return Ascii - 64 ; // Capital Alphabet
