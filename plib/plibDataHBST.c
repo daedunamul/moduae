@@ -152,9 +152,9 @@ void plibDataHBST_traverse( struct plibDataHBST *EntryNode , plibDataHBSTTravers
 	
 	if( EntryNode->Sub != plibCommonNullPointer )
 		for( Index = 0 ; Index < EntryNode->Sub->Length ; Index ++ )
-			plibDataHBST_flush( EntryNode->Sub->RootNodeArray[ Index ] , TraversedNodeFx ) ;
-	plibDataHBST_flush( EntryNode->Left ) ;
-	plibDataHBST_flush( EntryNode->Right ) ;
+			plibDataHBST_traverse( EntryNode->Sub->RootNodeArray[ Index ] , TraversedNodeFx ) ;
+	plibDataHBST_traverse( EntryNode->Left , TraversedNodeFx ) ;
+	plibDataHBST_traverse( EntryNode->Right , TraversedNodeFx ) ;
 	
 	if( TraversedNodeFx != plibCommonNullPointer )
 		TraversedNodeFx( EntryNode ) ;
