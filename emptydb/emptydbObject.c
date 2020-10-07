@@ -3,154 +3,167 @@
 */
 #include "emptydbObject.h"
 
-bool emptydbObject_createRootObject( struct emptydbRoot *Root , emptydbCommonKeyType Key )
+bool emptydbObject_createRoot( struct emptydbDB *DB , emptydbCommonKeyType Key )
 {
-	if( Root == plibStdTypeNullPointer || Root->ObjectRootNode != plibStdTypeNullPointer )
-		return false ;
-		
-	uint8_t *NewMemory = plbStdMemoryPool_allocate( Root->ObjectNodePool ) ;
-	
-	if( NewMemory == plibStdTypeNullPointer )
+	if( DB == plibCommonNullPointer || DB->ObjectRootNode != plibCommonNullPointer )
 		return false ;
 	
-	Root->ObjectRootNode = ( struct plibStdDataBST* )NewMemory ;
-	Root->ObjectRootNode->Key = NewMemory + sizeof( struct plibStdDataBST ) ;
-	*( emptydbCommonKeyType* )Root->ObjectRootNode->Key = Key ;
-	Root->ObjectRootNode->Type = emptydbCommonNodeTypeObject ;
-	Root->ObjectRootNode->Value = NewMemory + sizeof( struct plibStdDataBST ) + sizeof( emptydbCommonKeyType ) ;
-	( ( struct emptydbCommonObjectValueType* )Root->ObjectRootNode->Value )->MemberObjectRootNode = plibStdTypeNullPointer ;
-	( ( struct emptydbCommonObjectValueType* )Root->ObjectRootNode->Value )->MemberKeyValueRootNode = plibStdTypeNullPointer ;
-	Root->ObjectRootNode->Left = plibStdTypeNullPointer ;
-	Root->ObjectRootNode->Right = plibStdTypeNullPointer ;
+	plibCommonAnyType *NewMemory = plibMemoryPool_allocate( DB->ObjectNodePool ) ;
 	
-	Root->ObjectCount = 1 ;
+	if( NewMemory == plibCommonNullPointer )
+		return false ;
+	
+	DB->ObjectRootNode = emptydbCommon_referNode( NewMemory ) ;
+	DB->ObjectRootNode->Key = emptydbCommon_referKey( NewMemory ) ;
+	DB->ObjectRootNode->Left = plibCommonNullPointer ;
+	DB->ObjectRootNode->Right = plibCommonNullPointer ;
+	DB->ObjectRootNode->Sub = emptydbCommon_referSub( NewMemory ) ;
+	DB->ObjectRootNode->Sub->RootNodeArray = emptydbCommon_referSubRootArray( NewMemory ) ;
+	
+	*( emptydbCommonKeyType* )DB->ObjectRootNode->Key = Key ;
+	DB->ObjectRootNode->Sub->Count = 0 ;
+	DB->ObjectRootNode->Sub->Length = 2 ;
+	*emptydbCommon_referSubProperty( DB->ObjectRootNode->Sub ) = plibCommonNullPointer ;
+	*emptydbCommon_referSubObject( DB->ObjectRootNode->Sub ) = plibCommonNullPointer ;
+	
+	DB->ObjectCount = 1 ;
 	
 	return true ;
 }
-bool emptydbObject_deleteRootObject( struct emptydbRoot *Root )
+bool emptydbObject_deleteRoot( struct emptydbDB *DB )
 {
-	if( Root == plibStdTypeNullPointer || Root->ObjectRootNode == plibStdTypeNullPointer )
+	if( DB == plibCommonNullPointer || DB->ObjectRootNode == plibCommonNullPointer )
 		return false ;
 		
-	Root->ObjectRootNode = plibStdTypeNullPointer ;
-	Root->ObjectCount = 0 ;
-	plbStdMemoryPool_initialize( Root->ObjectNodePool ) ;
+	DB->ObjectRootNode = plibCommonNullPointer ;
+	DB->ObjectCount = 0 ;
+	plibMemoryPool_initialize( DB->ObjectNodePool ) ;
 	
 	return true ;
 }
 
-bool emptydbObject_createObject( struct emptydbRoot *Root , emptydbCommonCountType KeyCount , emptydbCommonKeyType *KeyArray )
+bool emptydbObject_create( struct emptydbDB *DB , struct emptydbStream *Stream )
 {
-	if( Root == plibStdTypeNullPointer || Root->ObjectThisNode == plibStdTypeNullPointer || KeyCount == 0 || KeyArray == plibStdTypeNullPointer )
+	if( DB == plibCommonNullPointer || DB->ObjectThisNode == plibCommonNullPointer )
 		return false ;
 	
-	emptydbCommonCountType Index ;
-	uint8_t *NewMemory ;
-	struct plibStdDataBST *NewObjectNode ;
+	plibCommonCountType Index ;
+	plibCommonAnyType *NewMemory ;
+	struct plibDataHBST *NewObjectNode ;
 	
-	for( Index = 0 ; Index < KeyCount ; Index ++ )
+	for( Index = 0 ; Index < Stream->Count ; Index ++ )
 	{
-		NewMemory = plbStdMemoryPool_allocate( Root->ObjectNodePool ) ;
-		NewObjectNode = ( struct plibStdDataBST* )NewMemory ;
-		NewObjectNode->Key = NewMemory + sizeof( struct plibStdDataBST ) ;
-		*( emptydbCommonKeyType* )NewObjectNode->Key = KeyArray[ Index ] ;
-		NewObjectNode->Type = emptydbCommonNodeTypeObject ;
-		NewObjectNode->Value = NewMemory + sizeof( struct plibStdDataBST ) + sizeof( emptydbCommonKeyType ) ; ;
-		( ( struct emptydbCommonObjectValueType* )NewObjectNode->Value )->MemberObjectRootNode = plibStdTypeNullPointer ;
-		( ( struct emptydbCommonObjectValueType* )NewObjectNode->Value )->MemberKeyValueRootNode = plibStdTypeNullPointer ;
-		NewObjectNode->Left = plibStdTypeNullPointer ;
-		NewObjectNode->Right = plibStdTypeNullPointer ;
+		NewMemory = plibMemoryPool_allocate( DB->ObjectNodePool ) ;
 		
-		if( plibStdDataBST_push( &( ( ( struct emptydbCommonObjectValueType* )Root->ObjectThisNode->Value )->MemberObjectRootNode ) , NewObjectNode , emptydbCommon_compareKey ) )
-			Root->ObjectCount ++ ;
+		if( NewMemory == plibCommonNullPointer )
+			return false ;
+		
+		NewObjectNode = emptydbCommon_referNode( NewMemory ) ;
+		NewObjectNode->Key = emptydbCommon_referKey( NewMemory ) ;
+		NewObjectNode->Value = plibCommonNullPointer ;
+		NewObjectNode->Left = plibCommonNullPointer ;
+		NewObjectNode->Right = plibCommonNullPointer ;
+		NewObjectNode->Sub = emptydbCommon_referSub( NewMemory ) ;
+		NewObjectNode->Sub->RootNodeArray = emptydbCommon_referSubRootArray( NewMemory ) ;
+		
+		*( emptydbCommonKeyType* )NewObjectNode->Key = *( emptydbCommonKeyType* )emptydbStream_refer( Stream , Index ) ;
+		NewObjectNode->Sub->Count = 0 ;
+		NewObjectNode->Sub->Length = 2 ;
+		*emptydbCommon_referSubProperty( NewObjectNode->Sub ) = plibCommonNullPointer ;
+		*emptydbCommon_referSubObject( NewObjectNode->Sub ) = plibCommonNullPointer ;
+		
+		if( plibDataHBST_push( emptydbCommon_referSubObject( DB->ObjectThisNode->Sub ) , NewObjectNode , emptydbCommon_compareKey ) )
+		{
+			DB->ObjectCount ++ ;
+			DB->ObjectThisNode->Sub->Count ++ ;
+		}
 		else
-			plbStdMemoryPool_deallocate( Root->ObjectNodePool , &NewMemory ) ;
+			plibMemoryPool_deallocate( DB->ObjectNodePool , &NewMemory ) ;
 	}
 	
 	return true ;
 }
-bool emptydbObject_deleteObject( struct emptydbRoot *Root , emptydbCommonCountType KeyCount , emptydbCommonKeyType *KeyArray )
+bool emptydbObject_delete( struct emptydbDB *DB , struct emptydbStream *Stream )
 {
-	if( Root == plibStdTypeNullPointer || Root->ObjectThisNode == plibStdTypeNullPointer || KeyCount == 0 || KeyArray == plibStdTypeNullPointer )
+	if( DB == plibCommonNullPointer || DB->ObjectThisNode == plibCommonNullPointer )
 		return false ;
 	
-	emptydbCommonCountType Index ;
-	struct plibStdDataBST *ObjectNode ;
+	plibCommonCountType Index ;
+	struct plibDataHBST *ObjectNode ;
 	
-	for( Index = 0 ; Index < KeyCount ; Index ++ )
+	for( Index = 0 ; Index < Stream->Count ; Index ++ )
 	{
-		ObjectNode = plibStdDataBST_pop( &( ( struct emptydbCommonObjectValueType* )Root->ObjectThisNode->Value )->MemberObjectRootNode , ( uint8_t* )( KeyArray + Index ) , emptydbCommon_compareKey ) ;
-		if( ObjectNode == plibStdTypeNullPointer )
+		ObjectNode = plibDataHBST_pop( emptydbCommon_referSubObject( DB->ObjectThisNode->Sub ) , emptydbStream_refer( Stream , Index ) , emptydbCommon_compareKey ) ;
+		if( ObjectNode == plibCommonNullPointer )
 			continue ;
 		
-		ObjectNode->Left = plibStdTypeNullPointer ;
-		ObjectNode->Right = plibStdTypeNullPointer ;
-		emptydbObject_flushObject( Root , ObjectNode ) ;
+		ObjectNode->Left = plibCommonNullPointer ;
+		ObjectNode->Right = plibCommonNullPointer ;
+		emptydbObject_flush( DB , ObjectNode ) ;
 	}
 	
 	return true ;
 }
-void emptydbObject_flushObject( struct emptydbRoot *Root , struct plibStdDataBST *ObjectEntryNode )
+void emptydbObject_flush( struct emptydbDB *DB , struct plibDataHBST *ObjectEntryNode )
 {
-	if( Root == plibStdTypeNullPointer || ObjectEntryNode == plibStdTypeNullPointer )
+	if( DB == plibCommonNullPointer || ObjectEntryNode == plibCommonNullPointer )
 		return ;
 	
-	struct plibStdDataBST *TempObjectNode = ObjectEntryNode , *TempObjectMemberNode = ( ( struct emptydbCommonObjectValueType* )TempObjectNode->Value )->MemberObjectRootNode ;
+	emptydbObject_flush( DB , *emptydbCommon_referSubObject( ObjectEntryNode->Sub ) ) ;
+	emptydbObject_flush( DB , ObjectEntryNode->Left ) ;
+	emptydbObject_flush( DB , ObjectEntryNode->Right ) ;
 	
-	if( TempObjectMemberNode != plibStdTypeNullPointer )
-		emptydbObject_flushObject( Root , TempObjectMemberNode ) ;
-	else if( TempObjectNode->Left != plibStdTypeNullPointer )
-		emptydbObject_flushObject( Root , TempObjectNode->Left ) ;
-	else if( TempObjectNode->Right != plibStdTypeNullPointer )
-		emptydbObject_flushObject( Root , TempObjectNode->Right ) ;
-	
-	emptydbKeyValue_flushKeyValue( Root , ( ( struct emptydbCommonObjectValueType* )TempObjectNode->Value )->MemberKeyValueRootNode ) ;
-	plbStdMemoryPool_deallocate( Root->ObjectNodePool , ( uint8_t** )( &TempObjectNode ) ) ;
-	Root->ObjectCount -- ;
+	emptydbProperty_flush( DB , *emptydbCommon_referSubProperty( ObjectEntryNode->Sub ) ) ;
+	plibMemoryPool_deallocate( DB->ObjectNodePool , ( plibCommonAnyType** )( &ObjectEntryNode ) ) ;
+	DB->ObjectCount -- ;
 }
 
-bool emptydbObject_pointObject( struct emptydbRoot *Root , emptydbCommonCountType KeyCount , emptydbCommonKeyType *KeyArray )
+bool emptydbObject_point( struct emptydbDB *DB , struct emptydbStream *Stream )
 {
-	if( Root == plibStdTypeNullPointer || Root->ObjectRootNode == plibStdTypeNullPointer || KeyCount == 0 || KeyArray == plibStdTypeNullPointer )
+	if( DB == plibCommonNullPointer || DB->ObjectRootNode == plibCommonNullPointer )
 	{
-		Root->ObjectThisNode = plibStdTypeNullPointer ;
+		DB->ObjectThisNode = plibCommonNullPointer ;
 		return false ;
 	}
 		
-	emptydbCommonCountType Index ;
-	struct plibStdDataBST *TempNode ;
+	plibCommonCountType Index ;
+	struct plibDataHBST *TempNode ;
 	
-	for( Index = 0 , TempNode = Root->ObjectRootNode ; Index < KeyCount ; Index ++ )
+	for( Index = 0 , TempNode = DB->ObjectRootNode ; Index < Stream->Count ; Index ++ )
 	{
-		TempNode = plibStdDataBST_lookup( TempNode , ( uint8_t* )( KeyArray +Index ) , emptydbCommon_compareKey ) ;
+		TempNode = plibDataHBST_lookup( TempNode , emptydbStream_refer( Stream , Index ) , emptydbCommon_compareKey ) ;
 		
-		if( TempNode == plibStdTypeNullPointer )
+		if( TempNode == plibCommonNullPointer )
 		{
-			Root->ObjectThisNode = plibStdTypeNullPointer ;
+			DB->ObjectThisNode = plibCommonNullPointer ;
 			return false ;
 		}
-		Root->ObjectThisNode = TempNode ;
-		TempNode = ( ( struct emptydbCommonObjectValueType* )TempNode->Value )->MemberObjectRootNode ;
+		DB->ObjectThisNode = TempNode ;
+		TempNode = *emptydbCommon_referSubObject( TempNode->Sub ) ;
 	}
 	
 	return true ;
 }
-emptydbCommonCountType emptydbObject_lookupObject( struct emptydbRoot *Root , emptydbCommonCountType KeyCount , emptydbCommonKeyType *KeyArray , struct plibStdDataBST **ResultObjectArray )
+void emptydbObject_lookup( struct emptydbDB *DB , struct emptydbStream *InputStream , struct emptydbStream *OutputStream )
 {
-	if( Root == plibStdTypeNullPointer || Root->ObjectThisNode == plibStdTypeNullPointer || KeyCount == 0 || KeyArray == plibStdTypeNullPointer )
-		return 0 ;
+	if( DB == plibCommonNullPointer || DB->ObjectThisNode == plibCommonNullPointer )
+		return ;
 	
-	emptydbCommonCountType Index , Count ;
-	struct plibStdDataBST *TempNode = ( ( struct emptydbCommonObjectValueType* )Root->ObjectThisNode->Value )->MemberObjectRootNode ;
-
-	for( Index = 0 , Count = 0 ; Index < KeyCount ; Index ++ )
+	plibCommonCountType Index ;
+	struct plibDataHBST *TempNode ;
+	
+	emptydbStream_reset( OutputStream ) ;
+	for( Index = 0 ; Index < InputStream->Count ; Index ++ )
 	{
-		TempNode = plibStdDataBST_lookup( TempNode , ( uint8_t* )( KeyArray + Index ) , emptydbCommon_compareKey ) ;
-		if( TempNode == plibStdTypeNullPointer )
+		TempNode = plibDataHBST_lookup
+		(
+			*emptydbCommon_referSubObject( DB->ObjectThisNode->Sub ) ,
+			emptydbStream_refer( InputStream , Index ) ,
+			emptydbCommon_compareKey
+		) ;
+		if( TempNode == plibCommonNullPointer )
 			continue ;
-		ResultObjectArray[ Count ] = TempNode ;
-		Count ++ ;
+		
+		emptydbStream_setNode( OutputStream , TempNode ) ;
 	}
-	
-	return Count ;
 }

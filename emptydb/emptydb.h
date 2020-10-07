@@ -1,8 +1,12 @@
 /*
 	emptydb
-	emptydbCommon::emptydbStream::emptydbRoot::emptydbProperty::emptydbObject::emptydbFile
+	
+	emptydbCommon::emptydbStream
+	emptydbStream::emptydbDB
+	emptydbDB::emptydbProperty
+	emptydbProperty::emptydbObject
+	emptydbObject::emptydbFile
 */
 #pragma once
-#include "emptydbProperty.h"
-//#include "emptydbObject.h"
+#include "emptydbObject.h"
 //#include "emptydbFile.h"

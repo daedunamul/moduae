@@ -3,11 +3,11 @@
 */
 #include "emptydbCommon.h"
 
-enum plibStdDataBSTStatus emptydbCommon_compareKey( uint8_t *Key1 , uint8_t *Key2 )
+enum plibDataHBSTStatus emptydbCommon_compareKey( plibCommonAnyType *Key1 , plibCommonAnyType *Key2 )
 {
 	if( *( emptydbCommonKeyType* )Key1 < *( emptydbCommonKeyType* )Key2 )
-		return plibStdDataBSTStatusLess ;
+		return plibDataHBSTStatusLess ;
 	else if( *( emptydbCommonKeyType* )Key1 > *( emptydbCommonKeyType* )Key2 )
-		return plibStdDataBSTStatusGreat ;
-	return plibStdDataBSTStatusEqual ;
+		return plibDataHBSTStatusGreat ;
+	return plibDataHBSTStatusEqual ;
 }

@@ -18,7 +18,7 @@ void plibMemoryPool_initialize( struct plibMemoryPool *Pool )
 	}
 }
 
-struct plibMemoryPool* plibMemoryPool_createPool( plibCommonCountType UnitSize , plibCommonCountType MaxCount )
+struct plibMemoryPool* plibMemoryPool_create( plibCommonCountType UnitSize , plibCommonCountType MaxCount )
 {
 	if( UnitSize == 0 || MaxCount == 0 )
 		return plibCommonNullPointer ;
@@ -34,7 +34,7 @@ struct plibMemoryPool* plibMemoryPool_createPool( plibCommonCountType UnitSize ,
 	
 	return NewPool ;
 }
-bool plibMemoryPool_deletePool( struct plibMemoryPool **Pool )
+bool plibMemoryPool_delete( struct plibMemoryPool **Pool )
 {
 	if( *Pool == plibCommonNullPointer )
 		return false ;

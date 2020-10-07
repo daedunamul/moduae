@@ -6,22 +6,19 @@
 #include "../plib/plibMemoryPool.h"
 
 typedef uint32_t emptydbCommonKeyType ;
-typedef uint32_t emptydbCommonCountType ;
-
-struct emptydbCommonObjectValueType
-{
-	struct plibStdDataBST *MemberObjectGenesisNode , *MemberPropertyGenesisNode ;
-} ;
 
 struct emptydbCommonPropertyValueType
 {
-	emptydbCommonCountType DataSize , DataLength ;
-	uint8_t DataType ;
-	uint8_t *Data ;
+	plibCommonCountType Type , Size , Length ;
+	plibCommonAnyType *Data ;
 } ;
 
-enum plibStdDataBSTStatus emptydbCommon_compareKey( uint8_t *Key1 , uint8_t *Key2 ) ;
+#define emptydbCommon_referNode( MemoryAddress ) ( struct plibDataHBST* )( MemoryAddress )
+#define emptydbCommon_referKey( MemoryAddress ) ( MemoryAddress + sizeof( struct plibDataHBST ) )
+#define emptydbCommon_referSub( MemoryAddress ) ( struct plibDataHBSTSub* )( MemoryAddress + sizeof( struct plibDataHBST ) + sizeof( emptydbCommonKeyType ) )
+#define emptydbCommon_referSubRootArray( MemoryAddress ) ( struct plibDataHBST** )( MemoryAddress + sizeof( struct plibDataHBST ) + sizeof( emptydbCommonKeyType ) + sizeof( struct plibDataHBSTSub ) )
+#define emptydbCommon_referPropertyValue( MemoryAddress ) ( MemoryAddress + sizeof( struct plibDataHBST ) + sizeof( emptydbCommonKeyType ) )
+#define emptydbCommon_referSubProperty( SubAddress ) ( SubAddress->RootNodeArray )
+#define emptydbCommon_referSubObject( SubAddress ) ( SubAddress->RootNodeArray + 1 )
 
-#define emptydbCommon_referNode( EntryAddress ) ( ( struct plibStdDataBST* )EntryAddress )
-#define emptydbCommon_referKey( EntryAddress ) ( EntryAddress + sizeof( struct plibStdDataBST ) )
-#define emptydbCommon_referValue( EntryAddress ) ( EntryAddress + sizeof( struct plibStdDataBST ) + sizeof( emptydbCommonKeyType ) )
+enum plibDataHBSTStatus emptydbCommon_compareKey( plibCommonAnyType *Key1 , plibCommonAnyType *Key2 ) ;

@@ -4,12 +4,12 @@
 #pragma once
 #include "emptydbProperty.h"
 
-bool emptydbObject_createRootObject( struct emptydbRoot *Root , emptydbCommonKeyType Key ) ;
-bool emptydbObject_deleteRootObject( struct emptydbRoot *Root ) ;
+bool emptydbObject_createRoot( struct emptydbDB *DB , emptydbCommonKeyType Key ) ;
+bool emptydbObject_deleteRoot( struct emptydbDB *DB ) ;
 
-bool emptydbObject_createObject( struct emptydbRoot *Root , emptydbCommonCountType KeyCount , emptydbCommonKeyType *KeyArray ) ;
-bool emptydbObject_deleteObject( struct emptydbRoot *Root , emptydbCommonCountType KeyCount , emptydbCommonKeyType *KeyArray ) ;
-void emptydbObject_flushObject( struct emptydbRoot *Root , struct plibStdDataBST *ObjectEntryNode ) ;
+bool emptydbObject_create( struct emptydbDB *DB , struct emptydbStream *Stream ) ;
+bool emptydbObject_delete( struct emptydbDB *DB , struct emptydbStream *Stream ) ;
+void emptydbObject_flush( struct emptydbDB *DB , struct plibDataHBST *ObjectEntryNode ) ;
 
-bool emptydbObject_pointObject( struct emptydbRoot *Root , emptydbCommonCountType KeyCount , emptydbCommonKeyType *KeyArray ) ;
-emptydbCommonCountType emptydbObject_lookupObject( struct emptydbRoot *Root , emptydbCommonCountType KeyCount , emptydbCommonKeyType *KeyArray , struct plibStdDataBST **ResultObjectArray ) ;
+bool emptydbObject_point( struct emptydbDB *DB , struct emptydbStream *Stream ) ;
+void emptydbObject_lookup( struct emptydbDB *DB , struct emptydbStream *InputStream , struct emptydbStream *OutputStream ) ;
