@@ -5,28 +5,20 @@
 #include "emptydbObject.h"
 #include <stdio.h>
 
-struct emptydbFileRootHeader
+struct emptydbFileDBHeader
 {
-	emptydbCommonCountType ObjectMaxCount , ObjectCount , KeyValueMaxCount , KeyValueCount ;
-	emptydbCommonKeyType ObjectRootNodeKey , ObjectThisNodeKey , KeyValueThisNodeKey ;
+	plibCommonCountType ObjectMaxCount , ObjectCount , PropertyMaxCount , PropertyCount ;
+	emptydbCommonKeyType ObjectRootNodeKey , ObjectThisNodeKey , PropertyThisNodeKey ;
 } ;
-struct emptydbFileObjectHeader
-{
-	emptydbCommonKeyType Key ;
-	uint8_t Type ;
-} ;
-struct emptydbFileKeyValueHeader
+struct emptydbFilePropertyHeader
 {
 	emptydbCommonKeyType Key ;
-	uint8_t Type ;
-	emptydbCommonCountType DataSize , DataLength ;
+	plibCommonCountType Type , Size , Length ;
 } ;
 
-struct emptydbRoot* emptydbFile_read( char *FileName ) ;
-void emptydbFile_readObject( FILE *DBFile , struct plibStdDataBST *Node ) ;
+struct emptydbDB* emptydbFile_read( char *FileName ) ;
+void emptydbFile_readObject( FILE *DBFile , struct plibDataHBST *Node ) ;
 
-bool emptydbFile_write( struct emptydbRoot *Root , char *FileName ) ;
-void emptydbFile_writeObject( struct plibStdDataBST *Node , FILE *DBFile ) ;
-void emptydbFile_writeKeyValue( struct plibStdDataBST *Node , FILE *DBFile ) ;
-
-void emptydbFile_countNode( struct plibStdDataBST *Entry , emptydbCommonCountType *Count ) ;
+bool emptydbFile_write( struct emptydbDB *DB , char *FileName ) ;
+void emptydbFile_writeObject( struct plibDataHBST *Node , FILE *DBFile ) ;
+void emptydbFile_writeProperty( struct plibDataHBST *Node , FILE *DBFile ) ;

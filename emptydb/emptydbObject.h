@@ -4,6 +4,8 @@
 #pragma once
 #include "emptydbProperty.h"
 
+#define emptydbObjectSubIndex 1
+
 bool emptydbObject_createRoot( struct emptydbDB *DB , emptydbCommonKeyType Key ) ;
 bool emptydbObject_deleteRoot( struct emptydbDB *DB ) ;
 

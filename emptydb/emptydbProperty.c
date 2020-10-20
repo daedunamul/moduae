@@ -11,31 +11,34 @@ bool emptydbProperty_create( struct emptydbDB *DB , struct emptydbStream *Stream
 	plibCommonCountType Index ;
 	plibCommonAnyType *NewMemory ;
 	struct plibDataHBST *NewPropertyNode ;
-	struct emptydbCommonPropertyValueType *NewValue ;
+	struct emptydbDBPropertyValueType *NewValue ;
 	
 	for( Index = 0 ; Index < Stream->Count ; Index ++ )
 	{
+		// allocating a node
 		NewMemory = plibMemoryPool_allocate( DB->PropertyNodePool ) ;
-		
 		if( NewMemory == plibCommonNullPointer )
 			return false ;
 		
-		NewPropertyNode = emptydbCommon_referNode( NewMemory ) ;
-		NewPropertyNode->Key = emptydbCommon_referKey( NewMemory ) ;
-		NewPropertyNode->Value = emptydbCommon_referPropertyValue( NewMemory ) ;
-		NewPropertyNode->Left = plibCommonNullPointer ;
-		NewPropertyNode->Right = plibCommonNullPointer ;
-		NewPropertyNode->Sub = plibCommonNullPointer ;
+		NewPropertyNode = emptydbDB_referNodeFromMemory( NewMemory ) ;
 		
+		// initializing
+		plibDataHBST_initialize( NewPropertyNode ) ;
+		
+		// allocating
+		NewPropertyNode->Key = emptydbDB_referKeyFromMemory( NewMemory ) ;
+		NewPropertyNode->Value = emptydbDB_referPropertyValueFromMemory( NewMemory ) ;
+		
+		// setting
 		*( emptydbCommonKeyType* )NewPropertyNode->Key = *( emptydbCommonKeyType* )emptydbStream_refer( Stream , Index ) ;
-
-		NewValue = ( struct emptydbCommonPropertyValueType* )NewPropertyNode->Value ;
+		
+		NewValue = ( struct emptydbDBPropertyValueType* )NewPropertyNode->Value ;
 		NewValue->Type = 0 ;
 		NewValue->Size = 0 ;
 		NewValue->Length = 0 ;
 		NewValue->Data = plibCommonNullPointer ;
 		
-		if( plibDataHBST_push( emptydbCommon_referSubProperty( DB->ObjectThisNode->Sub ) , NewPropertyNode , emptydbCommon_compareKey ) )
+		if( plibDataHBST_pushSub( DB->ObjectThisNode , emptydbPropertySubIndex , NewPropertyNode , emptydbCommon_compareKey ) )
 			DB->PropertyCount ++ ;
 		else
 			plibMemoryPool_deallocate( DB->PropertyNodePool , &NewMemory ) ;
@@ -53,7 +56,7 @@ bool emptydbProperty_delete( struct emptydbDB *DB , struct emptydbStream *Stream
 	
 	for( Index = 0 ; Index < Stream->Count ; Index ++ )
 	{
-		PropertyNode = plibDataHBST_pop( emptydbCommon_referSubProperty( DB->ObjectThisNode->Sub ) , emptydbStream_refer( Stream , Index ) , emptydbCommon_compareKey ) ;
+		PropertyNode = plibDataHBST_popSub( DB->ObjectThisNode , emptydbPropertySubIndex , emptydbStream_refer( Stream , Index ) , emptydbCommon_compareKey ) ;
 		if( PropertyNode == plibCommonNullPointer )
 			continue ;
 		
@@ -63,15 +66,18 @@ bool emptydbProperty_delete( struct emptydbDB *DB , struct emptydbStream *Stream
 	
 	return true ;
 }
-void emptydbProperty_flush( struct emptydbDB *DB , struct plibDataHBST *PropertyEntryNode )
+void emptydbProperty_flush( struct emptydbDB *DB , struct plibDataHBST *PropertyRootNode )
 {
-	if( DB == plibCommonNullPointer || PropertyEntryNode == plibCommonNullPointer )
+	if( DB == plibCommonNullPointer || PropertyRootNode == plibCommonNullPointer )
 		return ;
 	
-	emptydbProperty_flush( DB , PropertyEntryNode->Left ) ;
-	emptydbProperty_flush( DB , PropertyEntryNode->Right ) ;
-		
-	plibMemoryPool_deallocate( DB->PropertyNodePool , ( plibCommonAnyType** )( &PropertyEntryNode ) ) ;
+	plibDataHBST_traverse( PropertyRootNode , emptydbProperty_flushFx , ( plibCommonAnyType* )DB ) ;
+}
+void emptydbProperty_flushFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data )
+{
+	struct emptydbDB *DB = ( struct emptydbDB* )Data ;
+	
+	plibMemoryPool_deallocate( DB->PropertyNodePool , ( plibCommonAnyType** )( &TraversedNode ) ) ;
 	DB->PropertyCount -- ;
 }
 
@@ -87,8 +93,8 @@ void emptydbProperty_lookup( struct emptydbDB *DB , struct emptydbStream *InputS
 	for( Index = 0 ; Index < InputStream->Count ; Index ++ )
 	{
 		TempNode = plibDataHBST_lookup
-		( 
-			*emptydbCommon_referSubProperty( DB->ObjectThisNode->Sub ) , 
+		(
+			DB->ObjectThisNode->Sub[ emptydbPropertySubIndex ].RootNode ,
 			emptydbStream_refer( InputStream , Index ) , 
 			emptydbCommon_compareKey 
 		) ;

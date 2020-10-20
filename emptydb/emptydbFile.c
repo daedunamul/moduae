@@ -3,111 +3,80 @@
 */
 #include "emptydbFile.h"
 
-struct emptydbRoot* emptydbFile_read( char *FileName )
+struct emptydbDB* emptydbFile_read( char *FileName ) ;
 {
-	if( FileName == plibStdTypeNullPointer )
-		return plibStdTypeNullPointer ;
+	if( FileName == plibCommonNullPointer )
+		return plibCommonNullPointer ;
 	
 	FILE *DBFile = fopen( FileName , "rb" ) ;
-	if( DBFile == plibStdTypeNullPointer )
-		return plibStdTypeNullPointer ;
+	if( DBFile == plibCommonNullPointer )
+		return plibCommonNullPointer ;
 	
-	struct emptydbFileRootHeader RootHeader ;
-	struct emptydbRoot *NewRoot ;
+	struct emptydbFileDBHeader DBHeader ;
+	struct emptydbDB *NewDB ;
 	
-	// reading Root
-	fread( &RootHeader , sizeof( struct emptydbFileRootHeader ) , 1 , DBFile ) ;
-	NewRoot = emptydbRoot_create( RootHeader.ObjectMaxCount , RootHeader.KeyValueMaxCount ) ;
-	NewRoot->ObjectCount = RootHeader.ObjectCount ;
-	NewRoot->KeyValueCount = RootHeader.KeyValueCount ;
-	if( RootHeader.ObjectRootNodeKey != 0 )
+	// reading DB
+	fread( &DBHeader , sizeof( struct emptydbFileDBHeader ) , 1 , DBFile ) ;
+	NewDB = emptydbDB_create( DBHeader.ObjectMaxCount , DBHeader.PropertyMaxCount ) ;
+	NewDB->ObjectCount = DBHeader.ObjectCount ;
+	NewDB->PropertyCount = DBHeader.PropertyCount ;
+	if( DBHeader.ObjectRootNodeKey != 0 )
 	{
-		emptydbObject_createRootObject( NewRoot , RootHeader.ObjectRootNodeKey ) ;
+		emptydbObject_createRoot( NewDB , DBHeader.ObjectRootNodeKey ) ;
 		
-		// reading Objects and KeyValues
-		emptydbFile_readObject( DBFile , NewRoot->ObjectRootNode ) ;
+		// reading Objects and Properties
+		emptydbFile_readObject( DBFile , NewDB->ObjectRootNode ) ;
 	}
 		
 	fclose( DBFile ) ;
-	return NewRoot ;
+	return NewDB ;
 }
-void emptydbFile_readObject( FILE *DBFile , struct plibStdDataBST *Node )
+void emptydbFile_readObject( FILE *DBFile , struct plibDataHBST *Node )
 {
-	emptydbCommonCountType Counter ;
-	
-	fread( &Counter , sizeof( emptydbCommonCountType ) , 1 , DBFile ) ;
-	if( Counter == 0 )
-		return ;
-	
-	struct emptydbFileObjectHeader ObjectHeader ;
-	struct emptydbFileKeyValueHeader KeyValueHeader ;
-	struct emptydbCommonObjectValueType *ObjectValue = ( struct emptydbCommonObjectValueType* )Node->Value ;
-	
-	// read Object Header
-	fread( &ObjectHeader , sizeof( struct emptydbFileObjectHeader ) , 1 , DBFile ) ;
-	emptydbObject_createObject( ObjectValue->MemberObjectRootNode , 1 , &ObjectHeader.Key ) ;
-	
-	// read Member KeyValue
-	fread( &Counter , sizeof( emptydbCommonCountType ) , 1 , DBFile ) ;
-	while( Counter > 0 )
-	{
-		fread( &KeyValueHeader , sizeof( struct emptydbFileKeyValueHeader ) , 1 , DBFile ) ;
-		emptydbKeyValue_createKeyValue( ObjectValue->MemberKeyValueRootNode , 1 , &KeyValueHeader.Key , KeyValueHeader.DataSize , KeyValueHeader.DataLength ) ;
-		
-		Counter -- ;
-	}
-	
-	// read Member Object
-	fread( &Counter , sizeof( emptydbCommonCountType ) , 1 , DBFile ) ;
-	if( Counter != 0 )
-		emptydbFile_readObject( DBFile , ObjectValue->MemberObjectRootNode ) ;
-	
-	emptydbFile_readObject( DBFile , Node ) ;
+
 }
 
-bool emptydbFile_write( struct emptydbRoot *Root , char *FileName )
+bool emptydbFile_write( struct emptydbDB *DB , char *FileName )
 {
-	if( Root == plibStdTypeNullPointer || FileName == plibStdTypeNullPointer )
+	if( DB == plibCommonNullPointer || FileName == plibCommonNullPointer )
 		return false ;
 
 	FILE *DBFile = fopen( FileName , "wb" ) ;
-	if( DBFile == plibStdTypeNullPointer )
+	if( DBFile == plibCommonNullPointer )
 		return false ;
 	
-	struct emptydbFileRootHeader RootHeader ;
+	struct emptydbFileDBHeader DBHeader ;
 	
-	// writing Root
-	RootHeader.ObjectMaxCount = Root->ObjectMaxCount ; 
-	RootHeader.ObjectCount = Root->ObjectCount ;
-	RootHeader.KeyValueMaxCount = Root->KeyValueMaxCount ;
-	RootHeader.KeyValueCount = Root->KeyValueCount ;
-	RootHeader.ObjectRootNodeKey = Root->ObjectRootNode == plibStdTypeNullPointer ? 0 : *( emptydbCommonKeyType* )Root->ObjectRootNode->Key ;
-	RootHeader.ObjectThisNodeKey = Root->ObjectThisNode == plibStdTypeNullPointer ? 0 : *( emptydbCommonKeyType* )Root->ObjectThisNode->Key ;
-	RootHeader.KeyValueThisNodeKey = Root->KeyValueThisNode == plibStdTypeNullPointer ? 0 : *( emptydbCommonKeyType* )Root->KeyValueThisNode->Key ;
-	fwrite( &RootHeader , sizeof( struct emptydbFileRootHeader ) , 1 , DBFile ) ;
+	// writing DB
+	DBHeader.ObjectMaxCount = DB->ObjectMaxCount ; 
+	DBHeader.ObjectCount = DB->ObjectCount ;
+	DBHeader.PropertyMaxCount = DB->PropertyMaxCount ;
+	DBHeader.PropertyCount = DB->PropertyCount ;
+	DBHeader.ObjectRootNodeKey = DB->ObjectRootNode == plibCommonNullPointer ? 0 : *( emptydbCommonKeyType* )DB->ObjectRootNode->Key ;
+	DBHeader.ObjectThisNodeKey = DB->ObjectThisNode == plibCommonNullPointer ? 0 : *( emptydbCommonKeyType* )DB->ObjectThisNode->Key ;
+	DBHeader.PropertyThisNodeKey = DB->PropertyThisNode == plibCommonNullPointer ? 0 : *( emptydbCommonKeyType* )DB->PropertyThisNode->Key ;
+	fwrite( &DBHeader , sizeof( struct emptydbFileDBHeader ) , 1 , DBFile ) ;
 	
-	// writing Objects and KeyValues
-	emptydbFile_writeObject( ( struct emptydbCommonObjectValueType* )( Root->ObjectRootNode->Value )->MemberObjectRootNode , DBFile ) ;
+	// writing Objects and Properties
+	emptydbFile_writeObject( DB->ObjectRootNode , DBFile ) ;
 	
 	fclose( DBFile ) ;
 	return true ;
 }
-void emptydbFile_writeObject( struct plibStdDataBST *Node , FILE *DBFile )
+void emptydbFile_writeObject( struct plibDataHBST *Node , FILE *DBFile )
 {
-	emptydbCommonCountType Counter = 0 ;
-	
-	if( Node == plibStdTypeNullPointer )
-	{
-		fwrite( &Counter , sizeof( emptydbCommonCountType ) , 1 , DBFile ) ;
+	if( Node == plibCommonNullPointer )
 		return ;
-	}
-	else
-	{
-		Counter = 1 ;
-		fwrite( &Counter , sizeof( emptydbCommonCountType ) , 1 , DBFile ) ;
-	}
 	
-	struct emptydbFileObjectHeader ObjectHeader ;
+	// This Node Key
+	fwrite( ( emptydbCommonKeyType* )Node->Key , sizeof( emptydbCommonKeyType ) , 1 , DBFile ) ;
+	
+	// Left
+	
+	
+	
+	
+	
 	
 	// write Object Header
 	ObjectHeader.Key = *( emptydbCommonKeyType* )Node->Key ;
@@ -126,7 +95,7 @@ void emptydbFile_writeObject( struct plibStdDataBST *Node , FILE *DBFile )
 	emptydbFile_writeObject( Node->Left , DBFile ) ;
 	emptydbFile_writeObject( Node->Right , DBFile ) ;
 }
-void emptydbFile_writeKeyValue( struct plibStdDataBST *Node , FILE *DBFile )
+void emptydbFile_writeProperty( struct plibDataHBST *Node , FILE *DBFile )
 {
 	if( Node == plibStdTypeNullPointer )
 		return ;
@@ -142,16 +111,4 @@ void emptydbFile_writeKeyValue( struct plibStdDataBST *Node , FILE *DBFile )
 		emptydbFile_writeKeyValue( Node->Left , DBFile ) ;
 	else if( Node->Right != plibStdTypeNullPointer )
 		emptydbFile_writeKeyValue( Node->Right , DBFile ) ;
-}
-
-void emptydbFile_countNode( struct plibStdDataBST *Entry , emptydbCommonCountType *Count )
-{
-	if( Entry == plibStdTypeNullPointer )
-		return ;
-	
-	( *Count ) ++ ;
-	if( Entry->Left != plibStdTypeNullPointer )
-		emptydbFile_countNode( Entry->Left , Count ) ;
-	else if( Entry->Right != plibStdTypeNullPointer )
-		emptydbFile_countNode( Entry->Right , Count ) ;
 }

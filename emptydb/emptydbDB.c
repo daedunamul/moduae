@@ -16,12 +16,12 @@ struct emptydbDB* emptydbDB_create( plibCommonCountType ObjectMaxCount , plibCom
 	NewDB->PropertyCount = 0 ;
 	NewDB->ObjectNodePool = plibMemoryPool_create
 	(
-		sizeof( struct plibDataHBST ) + sizeof( emptydbCommonKeyType ) + sizeof( struct plibDataHBSTSub ) + sizeof( struct plibDataHBST* ) * 2 ,
+		sizeof( struct plibDataHBST ) + sizeof( emptydbCommonKeyType ) + sizeof( struct plibDataHBSTSub ) * 2 ,
 		ObjectMaxCount
 	) ;
 	NewDB->PropertyNodePool = plibMemoryPool_create
 	( 
-		sizeof( struct plibDataHBST ) + sizeof( emptydbCommonKeyType ) + sizeof( struct emptydbCommonPropertyValueType ) ,
+		sizeof( struct plibDataHBST ) + sizeof( emptydbCommonKeyType ) + sizeof( struct emptydbDBPropertyValueType ) ,
 		PropertyMaxCount
 	) ;
 	NewDB->ObjectRootNode = plibCommonNullPointer ;
