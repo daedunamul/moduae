@@ -227,6 +227,9 @@ void plibDataHBST_traverse( struct plibDataHBST *EntryNode , plibDataHBSTTravers
 	struct plibDataHBST *TempNode = EntryNode ;
 	plibCommonCountType Index = 0 ;
 	
+	if( TraversalFx == plibCommonNullPointer )
+		return ;
+	
 	if( TempNode != plibCommonNullPointer )
 	{
 		Visiting :

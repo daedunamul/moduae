@@ -105,23 +105,26 @@ bool emptydbObject_delete( struct emptydbDB *DB , struct emptydbStream *Stream )
 		
 		ObjectNode->Left = plibCommonNullPointer ;
 		ObjectNode->Right = plibCommonNullPointer ;
-		emptydbObject_flush( DB , ObjectNode ) ;
+		plibDataHBST_traverse( ObjectNode , emptydbObject_flushFx , ( plibCommonAnyType* )DB ) ;
 	}
 	
 	return true ;
 }
-void emptydbObject_flush( struct emptydbDB *DB , struct plibDataHBST *ObjectEntryNode )
+void emptydbObject_flushFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data )
 {
-	if( DB == plibCommonNullPointer || ObjectEntryNode == plibCommonNullPointer )
-		return ;
+	struct emptydbDB *DB = ( struct emptydbDB* )Data ;
 	
-	emptydbObject_flush( DB , ObjectEntryNode->Sub[ emptydbObjectSubIndex ].RootNode ) ;
-	emptydbObject_flush( DB , ObjectEntryNode->Left ) ;
-	emptydbObject_flush( DB , ObjectEntryNode->Right ) ;
-	
-	emptydbProperty_flush( DB , ObjectEntryNode->Sub[ emptydbPropertySubIndex ].RootNode ) ;
-	plibMemoryPool_deallocate( DB->ObjectNodePool , ( plibCommonAnyType** )( &ObjectEntryNode ) ) ;
-	DB->ObjectCount -- ;
+	switch( Index )
+	{
+		case emptydbPropertySubIndex :
+			plibMemoryPool_deallocate( DB->PropertyNodePool , ( plibCommonAnyType** )( &TraversedNode ) ) ;
+			DB->PropertyCount -- ;
+		break ;
+		case emptydbObjectSubIndex :
+			plibMemoryPool_deallocate( DB->ObjectNodePool , ( plibCommonAnyType** )( &TraversedNode ) ) ;
+			DB->ObjectCount -- ;
+		break ;
+	}
 }
 
 bool emptydbObject_point( struct emptydbDB *DB , struct emptydbStream *Stream )

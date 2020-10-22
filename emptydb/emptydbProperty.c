@@ -66,20 +66,6 @@ bool emptydbProperty_delete( struct emptydbDB *DB , struct emptydbStream *Stream
 	
 	return true ;
 }
-void emptydbProperty_flush( struct emptydbDB *DB , struct plibDataHBST *PropertyRootNode )
-{
-	if( DB == plibCommonNullPointer || PropertyRootNode == plibCommonNullPointer )
-		return ;
-	
-	plibDataHBST_traverse( PropertyRootNode , emptydbProperty_flushFx , ( plibCommonAnyType* )DB ) ;
-}
-void emptydbProperty_flushFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data )
-{
-	struct emptydbDB *DB = ( struct emptydbDB* )Data ;
-	
-	plibMemoryPool_deallocate( DB->PropertyNodePool , ( plibCommonAnyType** )( &TraversedNode ) ) ;
-	DB->PropertyCount -- ;
-}
 
 void emptydbProperty_lookup( struct emptydbDB *DB , struct emptydbStream *InputStream , struct emptydbStream *OutputStream )
 {
