@@ -47,10 +47,10 @@ bool emptydbObject_deleteRoot( struct emptydbDB *DB )
 	return true ;
 }
 
-bool emptydbObject_create( struct emptydbDB *DB , struct emptydbStream *Stream )
+struct plibDataHBST* emptydbObject_create( struct emptydbDB *DB , struct emptydbStream *Stream )
 {
 	if( DB == plibCommonNullPointer || DB->ObjectThisNode == plibCommonNullPointer )
-		return false ;
+		return plibCommonNullPointer ;
 	
 	plibCommonCountType Index ;
 	plibCommonAnyType *NewMemory ;
@@ -61,7 +61,7 @@ bool emptydbObject_create( struct emptydbDB *DB , struct emptydbStream *Stream )
 		// allocating a node
 		NewMemory = plibMemoryPool_allocate( DB->ObjectNodePool ) ;
 		if( NewMemory == plibCommonNullPointer )
-			return false ;
+			return plibCommonNullPointer ;
 		
 		NewObjectNode = emptydbDB_referNodeFromMemory( NewMemory ) ;
 		
@@ -87,7 +87,7 @@ bool emptydbObject_create( struct emptydbDB *DB , struct emptydbStream *Stream )
 			plibMemoryPool_deallocate( DB->ObjectNodePool , &NewMemory ) ;
 	}
 	
-	return true ;
+	return NewObjectNode ;
 }
 bool emptydbObject_delete( struct emptydbDB *DB , struct emptydbStream *Stream )
 {

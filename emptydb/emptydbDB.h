@@ -8,7 +8,7 @@ struct emptydbDB
 {
 	plibCommonCountType ObjectMaxCount , ObjectCount , PropertyMaxCount , PropertyCount ;
 	struct plibMemoryPool *ObjectNodePool , *PropertyNodePool ;
-	struct plibDataHBST *ObjectRootNode , *ObjectThisNode , *PropertyThisNode ;
+	struct plibDataHBST *ObjectRootNode , *ObjectThisNode ;
 } ;
 
 struct emptydbDBPropertyValueType

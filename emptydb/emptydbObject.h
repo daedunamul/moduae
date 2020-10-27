@@ -4,12 +4,12 @@
 #pragma once
 #include "emptydbProperty.h"
 
-#define emptydbObjectSubIndex 1
+#define emptydbObjectSubIndex 0
 
 bool emptydbObject_createRoot( struct emptydbDB *DB , emptydbCommonKeyType Key ) ;
 bool emptydbObject_deleteRoot( struct emptydbDB *DB ) ;
 
-bool emptydbObject_create( struct emptydbDB *DB , struct emptydbStream *Stream ) ;
+struct plibDataHBST* emptydbObject_create( struct emptydbDB *DB , struct emptydbStream *Stream ) ;
 bool emptydbObject_delete( struct emptydbDB *DB , struct emptydbStream *Stream ) ;
 void emptydbObject_flushFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data ) ;
 

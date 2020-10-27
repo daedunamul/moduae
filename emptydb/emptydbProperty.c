@@ -3,10 +3,10 @@
 */
 #include "emptydbProperty.h"
 
-bool emptydbProperty_create( struct emptydbDB *DB , struct emptydbStream *Stream )
+struct plibDataHBST* emptydbProperty_create( struct emptydbDB *DB , struct emptydbStream *Stream )
 {
 	if( DB == plibCommonNullPointer || DB->ObjectThisNode == plibCommonNullPointer )
-		return false ;
+		return plibCommonNullPointer ;
 		
 	plibCommonCountType Index ;
 	plibCommonAnyType *NewMemory ;
@@ -18,7 +18,7 @@ bool emptydbProperty_create( struct emptydbDB *DB , struct emptydbStream *Stream
 		// allocating a node
 		NewMemory = plibMemoryPool_allocate( DB->PropertyNodePool ) ;
 		if( NewMemory == plibCommonNullPointer )
-			return false ;
+			return plibCommonNullPointer ;
 		
 		NewPropertyNode = emptydbDB_referNodeFromMemory( NewMemory ) ;
 		
@@ -44,7 +44,7 @@ bool emptydbProperty_create( struct emptydbDB *DB , struct emptydbStream *Stream
 			plibMemoryPool_deallocate( DB->PropertyNodePool , &NewMemory ) ;
 	}
 	
-	return true ;
+	return NewPropertyNode ;
 }
 bool emptydbProperty_delete( struct emptydbDB *DB , struct emptydbStream *Stream )
 {

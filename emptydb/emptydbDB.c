@@ -26,7 +26,6 @@ struct emptydbDB* emptydbDB_create( plibCommonCountType ObjectMaxCount , plibCom
 	) ;
 	NewDB->ObjectRootNode = plibCommonNullPointer ;
 	NewDB->ObjectThisNode = plibCommonNullPointer ;
-	NewDB->PropertyThisNode = plibCommonNullPointer ;
 	
 	return NewDB ;
 }
