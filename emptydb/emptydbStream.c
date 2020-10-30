@@ -5,7 +5,15 @@
 
 struct emptydbStream* emptydbStream_create( plibCommonCountType Length , plibCommonCountType Size )
 {
+	if( Length == 0 || Size == 0 )
+		return plibCommonNullPointer ;
+	
+	// allocating
 	struct emptydbStream *NewStream = ( struct emptydbStream* )malloc( sizeof( struct emptydbStream ) ) ;
+	if( NewStream == plibCommonNullPointer )
+		return plibCommonNullPointer ;
+	
+	// setting
 	NewStream->Length = Length ;
 	NewStream->Size = Size ;
 	NewStream->Count = 0 ;
@@ -15,12 +23,13 @@ struct emptydbStream* emptydbStream_create( plibCommonCountType Length , plibCom
 }
 bool emptydbStream_delete( struct emptydbStream **Stream )
 {
-	if( *Stream == plibCommonNullPointer )
+	if( Stream == plibCommonNullPointer || *Stream == plibCommonNullPointer )
 		return false ;
 	
 	free( ( *Stream )->Data ) ;
 	free( *Stream ) ;
 	*Stream = plibCommonNullPointer ;
+	
 	return true ;
 }
 
@@ -28,32 +37,35 @@ plibCommonAnyType* emptydbStream_refer( struct emptydbStream *Stream , plibCommo
 {
 	if( Stream == plibCommonNullPointer || Index >= Stream->Length )
 		return plibCommonNullPointer ;
-	
+		
 	return Stream->Data + ( plibCommonAnyType )( Stream->Size * Index ) ;
 }
 
 void emptydbStream_reset( struct emptydbStream *Stream )
 {
-	if( Stream != plibCommonNullPointer )
-		Stream->Count = 0 ;
+	if( Stream == plibCommonNullPointer )
+		return ;
+	
+	Stream->Count = 0 ;
 }
-bool emptydbStream_setKey( struct emptydbStream *Stream , emptydbCommonKeyType Key )
+void emptydbStream_setKey( struct emptydbStream *Stream , emptydbCommonKeyType Key )
 {
 	emptydbCommonKeyType *KeyPointer = ( emptydbCommonKeyType* )emptydbStream_refer( Stream , Stream->Count ) ;
+	
+
 	if( KeyPointer == plibCommonNullPointer )
-		return false ;
+		return ;
 	
 	*KeyPointer = Key ;
 	Stream->Count ++ ;
-	return true ;
 }
-bool emptydbStream_setNode( struct emptydbStream *Stream , struct plibDataHBST *Node )
+void emptydbStream_setNode( struct emptydbStream *Stream , struct plibDataHBST *Node )
 {
 	struct plibDataHBST **NodePointer = ( struct plibDataHBST** )emptydbStream_refer( Stream , Stream->Count ) ;
-	if( NodePointer == plibCommonNullPointer )
-		return false ;
+	
+	if( *NodePointer == plibCommonNullPointer )
+		return ;
 	
 	*NodePointer = Node ;
 	Stream->Count ++ ;
-	return true ;
 }

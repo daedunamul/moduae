@@ -16,5 +16,5 @@ bool emptydbStream_delete( struct emptydbStream **Stream ) ;
 plibCommonAnyType* emptydbStream_refer( struct emptydbStream *Stream , plibCommonCountType Index ) ;
 
 void emptydbStream_reset( struct emptydbStream *Stream ) ;
-bool emptydbStream_setKey( struct emptydbStream *Stream , emptydbCommonKeyType Key ) ;
-bool emptydbStream_setNode( struct emptydbStream *Stream , struct plibDataHBST *Node ) ;
+void emptydbStream_setKey( struct emptydbStream *Stream , emptydbCommonKeyType Key ) ;
+void emptydbStream_setNode( struct emptydbStream *Stream , struct plibDataHBST *Node ) ;

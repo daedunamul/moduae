@@ -5,6 +5,13 @@
 #pragma once
 #include "plibCommon.h"
 
+enum
+{
+	plibDataHBSTErrorExistance = plibErrorDataHBST + 0x01 , 
+	plibDataHBSTErrorNoExistance = plibErrorDataHBST + 0x02 , 
+	plibDataHBSTErrorUnknownStatus = plibErrorDataHBST + 0x03 
+} ;
+
 enum plibDataHBSTStatus { plibDataHBSTStatusLess , plibDataHBSTStatusGreat , plibDataHBSTStatusEqual } ;
 
 struct plibDataHBSTSub
@@ -31,11 +38,11 @@ typedef void ( *plibDataHBSTTraversalFxType )( struct plibDataHBST *TraversedNod
 
 void plibDataHBST_initialize( struct plibDataHBST *Node ) ;
 
-bool plibDataHBST_push( struct plibDataHBST **EntryNode , struct plibDataHBST *NewNode , plibDataHBSTStatusFxType StatusFx ) ;
+void plibDataHBST_push( struct plibDataHBST **EntryNode , struct plibDataHBST *NewNode , plibDataHBSTStatusFxType StatusFx ) ;
 struct plibDataHBST* plibDataHBST_pop( struct plibDataHBST **EntryNode , plibCommonAnyType *Key , plibDataHBSTStatusFxType StatusFx ) ;
 struct plibDataHBST* plibDataHBST_lookup( struct plibDataHBST *ThisNode , plibCommonAnyType *Key , plibDataHBSTStatusFxType StatusFx ) ;
 
-bool plibDataHBST_pushSub( struct plibDataHBST *Node , plibCommonCountType Index , struct plibDataHBST *NewNode , plibDataHBSTStatusFxType StatusFx ) ;
+void plibDataHBST_pushSub( struct plibDataHBST *Node , plibCommonCountType Index , struct plibDataHBST *NewNode , plibDataHBSTStatusFxType StatusFx ) ;
 struct plibDataHBST* plibDataHBST_popSub( struct plibDataHBST *Node , plibCommonCountType Index , plibCommonAnyType *Key , plibDataHBSTStatusFxType StatusFx ) ;
 
 void plibDataHBST_traverse( struct plibDataHBST *EntryNode , plibDataHBSTTraversalFxType TraversalFx , plibCommonAnyType *Data ) ;

@@ -14,7 +14,7 @@ struct plibMemoryPool
 void plibMemoryPool_initialize( struct plibMemoryPool *Pool ) ;
 
 struct plibMemoryPool* plibMemoryPool_create( plibCommonCountType UnitSize , plibCommonCountType MaxCount ) ;
-bool plibMemoryPool_delete( struct plibMemoryPool **Pool ) ;
+void plibMemoryPool_delete( struct plibMemoryPool **Pool ) ;
 
 plibCommonAnyType* plibMemoryPool_allocate( struct plibMemoryPool *Pool ) ;
 void plibMemoryPool_deallocate( struct plibMemoryPool *Pool , plibCommonAnyType **UsedAddress ) ;

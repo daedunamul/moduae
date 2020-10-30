@@ -12,4 +12,4 @@ struct plibDataChain
 
 void plibDataChain_push( bool Direction , struct plibDataChain **EntryNode , struct plibDataChain *NewNode ) ;
 struct plibDataChain* plibDataChain_pop( bool Direction , struct plibDataChain **EntryNode ) ;
-struct plibDataChain* plibDataChain_lookup( bool Direction , unsigned int Index , struct plibDataChain *ThisNode ) ;
+struct plibDataChain* plibDataChain_lookup( bool Direction , plibCommonCountType Index , struct plibDataChain *ThisNode ) ;

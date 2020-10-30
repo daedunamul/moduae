@@ -22,6 +22,8 @@ bool emptydbFile_write( struct emptydbDB *DB , char *FileName )
 	
 	// node
 	plibDataHBST_traverse( DB->ObjectRootNode , emptydbFile_writeNode , ( plibCommonAnyType* )File ) ;
+	if( plibError != plibErrorNull )
+		return false ;
 	
 	fclose( File ) ;
 	return true ;
@@ -62,7 +64,6 @@ struct emptydbDB* emptydbFile_read( char *FileName )
 	struct emptydbDB *DB ;
 	struct plibDataHBST *TempNode ;
 	struct emptydbDBPropertyValueType *PropertyValue ;
-	struct emptydbStream *InputStream = emptydbStream_create( 1 , sizeof( emptydbCommonKeyType ) ) ;
 	
 	struct emptydbFileHeader Header ;
 	struct emptydbFileNode Node ;
@@ -89,7 +90,6 @@ struct emptydbDB* emptydbFile_read( char *FileName )
 		if( feof( File ) )
 			break ;
 		
-		emptydbStream_setKey( InputStream , Node.Key ) ;
 		switch( Node.SuperIndex )
 		{
 			case emptydbObjectSubIndex : 
@@ -98,7 +98,7 @@ struct emptydbDB* emptydbFile_read( char *FileName )
 					DB->ObjectThisNode = DB->ObjectThisNode->Super ;
 				
 				// creating object
-				TempNode = emptydbObject_create( DB , InputStream ) ;
+				TempNode = emptydbObject_create( DB , ( plibCommonAnyType* )( &Node.Key ) ) ;
 				if( Node.SubFlag )
 					DB->ObjectThisNode = TempNode ;
 			break ;
@@ -108,7 +108,7 @@ struct emptydbDB* emptydbFile_read( char *FileName )
 					DB->ObjectThisNode = DB->ObjectThisNode->Super ;
 				
 				// creating property
-				TempNode = emptydbProperty_create( DB , InputStream ) ;
+				TempNode = emptydbProperty_create( DB , ( plibCommonAnyType* )( &Node.Key ) ) ;
 				PropertyValue = ( struct emptydbDBPropertyValueType* )TempNode->Value ;
 				
 				// reading value
@@ -118,11 +118,9 @@ struct emptydbDB* emptydbFile_read( char *FileName )
 				PropertyValue->Length = Value.Length ;
 			break ;
 		}
-		emptydbStream_reset( InputStream ) ;
 	}
 	DB->ObjectThisNode = plibCommonNullPointer ;
 	
-	emptydbStream_delete( &InputStream ) ;
 	fclose( File ) ;
 	return DB ;
 }
