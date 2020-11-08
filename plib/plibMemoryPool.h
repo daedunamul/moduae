@@ -6,7 +6,7 @@
 
 struct plibMemoryPool
 {
-	plibCommonCountType UnitSize , Count , MaxCount ;
+	plibCommonCountType UnitSize , MaxCount , Count ;
 	plibCommonAnyType *AddressStart , *AddressEnd ;
 	plibCommonAnyType **AddressStack ;
 } ;
