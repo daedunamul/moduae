@@ -173,7 +173,7 @@ struct plibDataHBST* plibDataHBST_pop( struct plibDataHBST **EntryNode , plibCom
 				else
 				{
 					// getting a node that is most high value at left tree of this node
-					for( CandidateNode = ThisNode->Left ; CandidateNode != plibCommonNullPointer ; CandidateNode = CandidateNode->Right ) ;
+					for( CandidateNode = ThisNode->Left ; CandidateNode->Right != plibCommonNullPointer ; CandidateNode = CandidateNode->Right ) ;
 					if( CandidateNode != ThisNode->Left )
 					{
 						CandidateNode->Top->Right = CandidateNode->Left ;
