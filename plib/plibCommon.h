@@ -2,7 +2,9 @@
 	plib::Common
 */
 #pragma once
-#include "plibError.h"
+#include <stdbool.h>
+#include <stdint.h>
+#include <stddef.h>
 
 #define plibCommonNullPointer ( void* )0
 

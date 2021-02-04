@@ -3,16 +3,14 @@
 */
 #include "plibDataChain.h"
 
-void plibDataChain_push( bool Direction , struct plibDataChain **EntryNode , struct plibDataChain *NewNode )
+void plibDataChain_push( bool Direction , struct plibDataChain **EntryNode , struct plibDataChain *NewNode , struct plibErrorType *Error )
 {
-	// plibError
+	// error
 	if( EntryNode == plibCommonNullPointer || NewNode == plibCommonNullPointer )
 	{
-		plibError = plibErrorParameterNull ;
+		plibError_report( Error , plibErrorTypeParameter , plibDataChain_push ) ;
 		return ;
 	}
-	else
-		plibError = plibErrorNull ;
 	
 	if( *EntryNode == plibCommonNullPointer )
 	{
@@ -42,16 +40,14 @@ void plibDataChain_push( bool Direction , struct plibDataChain **EntryNode , str
 		}
 	}
 }
-struct plibDataChain* plibDataChain_pop( bool Direction , struct plibDataChain **EntryNode )
+struct plibDataChain* plibDataChain_pop( bool Direction , struct plibDataChain **EntryNode , struct plibErrorType *Error )
 {
-	// plibError
+	// error
 	if( EntryNode == plibCommonNullPointer || *EntryNode == plibCommonNullPointer )
 	{
-		plibError = plibErrorParameterNull ;
+		plibError_report( Error , plibErrorTypeParameter , plibDataChain_pop ) ;
 		return plibCommonNullPointer ;
 	}
-	else
-		plibError = plibErrorNull ;
 	
 	struct plibDataChain* OldNode ;
 	
@@ -74,16 +70,14 @@ struct plibDataChain* plibDataChain_pop( bool Direction , struct plibDataChain *
 	
 	return OldNode ;
 }
-struct plibDataChain* plibDataChain_lookup( bool Direction , plibCommonCountType Index , struct plibDataChain *ThisNode )
+struct plibDataChain* plibDataChain_lookup( bool Direction , plibCommonCountType Index , struct plibDataChain *ThisNode , struct plibErrorType *Error )
 {
-	// plibError
+	// error
 	if( ThisNode == plibCommonNullPointer )
 	{
-		plibError = plibErrorParameterNull ;
+		plibError_report( Error , plibErrorTypeParameter , plibDataChain_lookup ) ;
 		return plibCommonNullPointer ;
 	}
-	else
-		plibError = plibErrorNull ;
 	
 	plibCommonCountType Count ;
 	
