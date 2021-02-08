@@ -40,14 +40,14 @@ struct edbDB* edb_createDB( plibCommonCountType ObjectMaxCount , plibCommonCount
 	
 	// NodePool
 	NewDB->ObjectNodePool = plibMemoryPool_create( sizeof( struct plibDataHBST ) + sizeof( edbKeyType ) + sizeof( struct plibDataHBSTSub ) * 2 , ObjectMaxCount , &Error->InternalError ) ;
-	if( Error->InternalError.Type != plibErrorTypeNull )
+	if( NewDB->ObjectNodePool == plibCommonNullPointer )
 	{
 		edb_reportError( Error , edbErrorDBCreationAllocationObjectNodePool ) ;
 		edb_deleteDB( &NewDB , Error ) ;
 		return plibCommonNullPointer ;
 	}
 	NewDB->PropertyNodePool = plibMemoryPool_create( sizeof( struct plibDataHBST ) + sizeof( edbKeyType ) + sizeof( struct edbPropertyValue ) , PropertyMaxCount , &Error->InternalError ) ;
-	if( Error->InternalError.Type != plibErrorTypeNull )
+	if( NewDB->PropertyNodePool == plibCommonNullPointer )
 	{
 		edb_reportError( Error , edbErrorDBCreationAllocationPropertyNodePool ) ;
 		edb_deleteDB( &NewDB , Error ) ;
@@ -96,9 +96,6 @@ void edb_deleteDB( struct edbDB **DB , struct edbError *Error )
 		return ;
 	}
 	
-	// value
-	plibDataHBST_traverse( ( *DB )->ObjectRootNode , edb_flushValueFx , plibCommonNullPointer , &Error->InternalError ) ;
-	
 	// pool
 	if( &( *DB )->PropertyNodePool != plibCommonNullPointer )
 		plibMemoryPool_delete( &( *DB )->PropertyNodePool , &Error->InternalError ) ;
@@ -125,7 +122,7 @@ struct plibDataHBST* edb_createNode( struct edbDB *DB , struct plibDataHBST *Sup
 	
 	// allocating memory
 	NewMemory = SubNodeType ? plibMemoryPool_allocate( DB->PropertyNodePool , &Error->InternalError ) : plibMemoryPool_allocate( DB->ObjectNodePool , &Error->InternalError ) ;
-	if( Error->InternalError.Type != plibErrorTypeNull )
+	if( NewMemory == plibCommonNullPointer )
 	{
 		edb_reportError( Error , edbErrorNodeCreationAllocation ) ;
 		return plibCommonNullPointer ;
@@ -146,7 +143,7 @@ struct plibDataHBST* edb_createNode( struct edbDB *DB , struct plibDataHBST *Sup
 		// pointing and setting value
 		NewNode->Value = NewMemory + sizeof( struct plibDataHBST ) + sizeof( edbKeyType ) ;
 		NewValue = ( struct edbPropertyValue* )NewNode->Value ;
-		NewValue->Type = edbValueTypeNull ;
+		NewValue->Type = 0 ;
 		NewValue->Data = plibCommonNullPointer ;
 		
 		// setting value name
@@ -155,8 +152,7 @@ struct plibDataHBST* edb_createNode( struct edbDB *DB , struct plibDataHBST *Sup
 		sprintf( NewValue->Name , "%d%02d%02d_%02d%02d%02d_%03d" , TempTimeInfo->tm_year + 1900 , TempTimeInfo->tm_mon + 1 , TempTimeInfo->tm_mday , TempTimeInfo->tm_hour , TempTimeInfo->tm_min , TempTimeInfo->tm_sec , DB->PropertyCount ) ;
 		
 		// pushing property
-		plibDataHBST_pushSub( SuperObject , edbNodeProperty , NewNode , edbKey_compare , &Error->InternalError ) ;
-		if( Error->InternalError.Type == plibErrorTypeNull )
+		if( plibDataHBST_pushSub( SuperObject , edbNodeProperty , NewNode , edbKey_compare , &Error->InternalError ) == true )
 			DB->PropertyCount ++ ;
 		else
 		{
@@ -176,8 +172,7 @@ struct plibDataHBST* edb_createNode( struct edbDB *DB , struct plibDataHBST *Sup
 		NewNode->Sub[ edbNodeProperty ].RootNode = plibCommonNullPointer ;
 		
 		// pushing object
-		plibDataHBST_pushSub( SuperObject , edbNodeObject , NewNode , edbKey_compare , &Error->InternalError ) ;
-		if( Error->InternalError.Type == plibErrorTypeNull )
+		if( plibDataHBST_pushSub( SuperObject , edbNodeObject , NewNode , edbKey_compare , &Error->InternalError ) == true )
 			DB->ObjectCount ++ ;
 		else
 		{
@@ -204,7 +199,7 @@ void edb_deleteNode( struct edbDB *DB , struct plibDataHBST *SuperObject , bool 
 	{
 		case false : 
 			Node = plibDataHBST_popSub( SuperObject , edbNodeObject , SubNodeKey , edbKey_compare , &Error->InternalError ) ;
-			if( Error->InternalError.Type != plibErrorTypeNull )
+			if( Node == plibCommonNullPointer )
 			{
 				edb_reportError( Error , edbErrorNodeDeletionDeallocation ) ;
 				return ;
@@ -216,13 +211,12 @@ void edb_deleteNode( struct edbDB *DB , struct plibDataHBST *SuperObject , bool 
 		break ;
 		case true : 
 			Node = plibDataHBST_popSub( SuperObject , edbNodeProperty , SubNodeKey , edbKey_compare , &Error->InternalError ) ;
-			if( Error->InternalError.Type != plibErrorTypeNull )
+			if( Node == plibCommonNullPointer )
 			{
 				edb_reportError( Error , edbErrorNodeDeletionDeallocation ) ;
 				return ;
 			}
 			
-			edb_undefineValue( Node , Error ) ;
 			plibMemoryPool_deallocate( DB->PropertyNodePool , ( plibCommonAnyType** )( &Node ) , &Error->InternalError ) ;
 			DB->PropertyCount -- ;
 		break ;
@@ -231,7 +225,6 @@ void edb_deleteNode( struct edbDB *DB , struct plibDataHBST *SuperObject , bool 
 void edb_flushNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error )
 {
 	struct edbDB *DB = ( struct edbDB* )Data ;
-	struct edbError DBError ;
 	
 	switch( Index )
 	{
@@ -240,7 +233,6 @@ void edb_flushNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountType I
 			DB->ObjectCount -- ;
 		break ;
 		case edbNodeProperty :
-			edb_undefineValue( TraversedNode , &DBError ) ;
 			plibMemoryPool_deallocate( DB->PropertyNodePool , ( plibCommonAnyType** )( &TraversedNode ) , Error ) ;
 			DB->PropertyCount -- ;
 		break ;
@@ -261,98 +253,11 @@ struct plibDataHBST* edb_lookupNode( struct edbDB *DB , struct plibDataHBST *Sup
 		Node = plibDataHBST_lookup( SuperObject->Sub[ edbNodeProperty ].RootNode , SubNodeKey , edbKey_compare , &Error->InternalError ) ;
 	else
 		Node = plibDataHBST_lookup( SuperObject->Sub[ edbNodeObject ].RootNode , SubNodeKey , edbKey_compare , &Error->InternalError ) ;
-	if( Error->InternalError.Type != plibErrorTypeNull )
+	if( Node == plibCommonNullPointer )
 	{
 		edb_reportError( Error , edbErrorNodeLookingupNothing ) ;
 		return plibCommonNullPointer ;
 	}
 	
 	return Node ;
-}
-
-void edb_defineValue( struct plibDataHBST *Property , enum edbValueType Type , struct edbError *Error )
-{	
-	// error
-	if( Property == plibCommonNullPointer || Property->SuperIndex == edbNodeObject || Type == edbValueTypeNull )
-	{
-		edb_reportError( Error , edbErrorValueDefinitionParameter ) ;
-		return ;
-	}
-	
-	struct edbPropertyValue *Value = ( struct edbPropertyValue* )Property->Value ;
-	
-	Value->Type = Type ;
-	switch( Type )
-	{
-		case edbValueTypeByte : 
-			Value->Data = malloc( sizeof( uint8_t ) ) ;
-		break ;
-		case edbValueTypeInteger : 
-			Value->Data = malloc( sizeof( int32_t ) ) ;
-		break ;
-		case edbValueTypeFloat : 
-			Value->Data = malloc( sizeof( float ) ) ;
-		break ;
-		case edbValueTypeFile : 
-			Value->Data = ( plibCommonAnyType* )fopen( Value->Name , "w+" ) ;
-		break ;
-		
-		case edbValueTypeNull : 
-		break ;
-	}
-	if( Value->Data == plibCommonNullPointer )
-	{
-		edb_reportError( Error , edbErrorValueDefinitionAllocation ) ;
-		Value->Type = edbValueTypeNull ;
-	}
-}
-void edb_undefineValue( struct plibDataHBST *Property , struct edbError *Error )
-{
-	// error
-	if( Property == plibCommonNullPointer || Property->SuperIndex == edbNodeObject )
-	{
-		edb_reportError( Error , edbErrorValueUndefinitionParameter ) ;
-		return ;
-	}
-	
-	struct edbPropertyValue *Value = ( struct edbPropertyValue* )Property->Value ;
-	
-	switch( Value->Type )
-	{
-		case edbValueTypeByte : 
-		case edbValueTypeInteger : 
-		case edbValueTypeFloat : 
-			free( Value->Data ) ;
-		break ;
-		case edbValueTypeFile : 
-			fclose( ( FILE* )Value->Data ) ;
-		break ;
-		
-		case edbValueTypeNull : 
-		break ;
-	}
-	Value->Type = edbValueTypeNull ;
-	Value->Data = plibCommonNullPointer ;
-}
-void edb_flushValueFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error )
-{
-	if( Index == edbNodeObject )
-		return ;
-		
-	struct edbPropertyValue *Value = ( struct edbPropertyValue* )TraversedNode->Value ;
-	
-	switch( Value->Type )
-	{
-		case edbValueTypeByte : 
-		case edbValueTypeInteger : 
-		case edbValueTypeFloat : 
-			free( Value->Data ) ;
-		break ;
-		case edbValueTypeFile : 
-			fclose( ( FILE* )Value->Data ) ;
-		break ;
-		
-		case edbValueTypeNull : 
-		break ;
-	}
 }

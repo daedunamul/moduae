@@ -11,11 +11,12 @@ void edbcmd_run(  )
 	int Temp1 , Temp2 ;
 	edbKeyType TempKey ;
 	struct plibDataHBST *TempNode ;
-	struct edbPropertyValue *TempValue ;
 	
 	edbcmd_initializeStatus( &Status ) ;
 	
-	setlocale( LC_ALL , "ko_KR.utf8" ) ;
+	// POSIX
+	mkdir( edbcmdWorkingDirectory ) ;
+	chdir( edbcmdWorkingDirectory ) ;
 	
 	while( Command != edbcmdCommandQuit )
 	{
@@ -100,11 +101,9 @@ void edbcmd_run(  )
 					continue ;
 				}
 				
-				printf( "Key Type>\n" ) ;
-				scanf( "%d%s" , &TempKey , InputString ) ;
-				chdir( edbcmdDirectoryValue ) ;
-				edb_defineValue( edb_createNode( Status.WorkingDB , Status.WorkingObject , true , ( plibCommonAnyType* )( &TempKey ) , &Status.Error ) , edbcmd_getValueType( InputString ) , &Status.Error ) ;
-				chdir( ".." ) ;
+				printf( "Key>\n" ) ;
+				scanf( "%d" , &TempKey ) ;
+				edb_createNode( Status.WorkingDB , Status.WorkingObject , true , ( plibCommonAnyType* )( &TempKey ) , &Status.Error ) ;
 				
 				edbcmd_printError( &Status.Error ) ;
 			break ;
@@ -117,6 +116,7 @@ void edbcmd_run(  )
 				}
 				
 				edb_deleteDB( &Status.WorkingDB , &Status.Error ) ;
+				edbcmd_initializeStatus( &Status ) ;
 				
 				edbcmd_printError( &Status.Error ) ;
 			break ;
@@ -134,6 +134,7 @@ void edbcmd_run(  )
 				
 				printf( "Key>" ) ;
 				scanf( "%d" , &TempKey ) ;
+				plibDataHBST_traverse( Status.WorkingObject , edbcmd_flushValueFileFx , plibCommonNullPointer , &Status.Error.InternalError ) ;
 				edb_deleteNode( Status.WorkingDB , Status.WorkingObject , false , ( plibCommonAnyType* )( &TempKey ) , &Status.Error ) ;
 				
 				edbcmd_printError( &Status.Error ) ;
@@ -152,10 +153,8 @@ void edbcmd_run(  )
 				
 				printf( "Key>" ) ;
 				scanf( "%d" , &TempKey ) ;
-				chdir( edbcmdDirectoryValue ) ;
+				edbcmd_flushValueFileFx( edb_lookupNode( Status.WorkingDB , Status.WorkingObject , edbNodeProperty , ( plibCommonAnyType* )( &TempKey ) , &Status.Error ) , edbNodeProperty , plibCommonNullPointer , plibCommonNullPointer ) ;
 				edb_deleteNode( Status.WorkingDB , Status.WorkingObject , true , ( plibCommonAnyType* )( &TempKey ) , &Status.Error ) ;
-				chdir( ".." ) ;
-				
 				Status.WorkingProperty = plibCommonNullPointer ;
 				
 				edbcmd_printError( &Status.Error ) ;
@@ -265,29 +264,7 @@ void edbcmd_run(  )
 					continue ;
 				}
 				
-				TempValue = ( struct edbPropertyValue* )Status.WorkingProperty->Value ;
-				switch( TempValue->Type )
-				{
-					case edbValueTypeByte : 
-						printf( "Byte>" ) ;
-						scanf( "%u" , ( unsigned int* )TempValue->Data ) ;
-					break ;
-					case edbValueTypeInteger : 
-						printf( "Integer>" ) ;
-						scanf( "%d" , ( int32_t* )TempValue->Data ) ;
-					break ;
-					case edbValueTypeFloat : 
-						printf( "Float>" ) ;
-						scanf( "%f" , ( float* )TempValue->Data ) ;
-					break ;
-					case edbValueTypeFile : 
-						edbcmd_writeValueFile( ( FILE* )TempValue->Data ) ;
-					break ;
-					
-					case edbValueTypeNull : 
-					default : 
-						printf( "edbcmd>unknown type.\n" ) ;
-				}
+				edbcmd_writeValueFile( ( struct edbPropertyValue* )Status.WorkingProperty->Value ) ;
 			break ;
 			case edbcmdCommandreadValue : 
 				if( Status.WorkingDB == plibCommonNullPointer )
@@ -301,33 +278,32 @@ void edbcmd_run(  )
 					continue ;
 				}
 				
-				TempValue = ( struct edbPropertyValue* )Status.WorkingProperty->Value ;
-				switch( TempValue->Type )
-				{
-					case edbValueTypeByte : 
-						printf( "edbcmd> Byte : %u\n" , *( unsigned int* )TempValue->Data ) ;
-					break ;
-					case edbValueTypeInteger : 
-						printf( "edbcmd> Integer : %d\n" , *( int32_t* )TempValue->Data ) ;
-					break ;
-					case edbValueTypeFloat : 
-						printf( "edbcmd> Float : %f\n" , *( float* )TempValue->Data ) ;
-					break ;
-					case edbValueTypeFile : 
-						edbcmd_readValueFile( ( FILE* )TempValue->Data ) ;
-					break ;
-					
-					case edbValueTypeNull : 
-					default : 
-						printf( "edbcmd>unknown type.\n" ) ;
-				}
+				edbcmd_readValueFile( ( struct edbPropertyValue* )Status.WorkingProperty->Value ) ;
 			break ;
 			
 			case edbcmdCommandLoadDB : 
+				if( Status.WorkingDB != plibCommonNullPointer )
+				{
+					printf( "edbcmd>db is existed.\n" ) ;
+					continue ;
+				}
 				
+				printf( "DB Name>\n" ) ;
+				scanf( "%s" , InputString ) ;
+				Status.WorkingDB = edbcmd_readDB( InputString ) ;
+				if( Status.WorkingDB != plibCommonNullPointer )
+					Status.WorkingObject = Status.WorkingDB->ObjectRootNode ;
 			break ;
 			case edbcmdCommandSaveDB : 
+				if( Status.WorkingDB == plibCommonNullPointer )
+				{
+					printf( "edbcmd>db is not existed.\n" ) ;
+					continue ;
+				}
 				
+				printf( "DB Name>\n" ) ;
+				scanf( "%s" , InputString ) ;
+				edbcmd_writeDB( Status.WorkingDB , InputString ) ;
 			break ;
 			
 			default : 
@@ -345,9 +321,6 @@ bool edbcmd_initializeStatus( struct edbcmdStatus *Status )
 	Status->WorkingDB = plibCommonNullPointer ;
 	Status->WorkingObject = plibCommonNullPointer ;
 	Status->WorkingProperty = plibCommonNullPointer ;
-	
-	// POSIX
-	mkdir( edbcmdDirectoryValue ) ;
 	
 	return true ;
 }
@@ -390,20 +363,12 @@ enum edbcmdCommand edbcmd_getCommand( char *InputString )
 	else if( strcmp( InputString , "readvalue" ) == 0 )
 		return edbcmdCommandreadValue ;
 		
+	else if( strcmp( InputString , "load" ) == 0 )
+		return edbcmdCommandLoadDB ;
+	else if( strcmp( InputString , "save" ) == 0 )
+		return edbcmdCommandSaveDB ;
+		
 	return edbcmdCommandNull ;
-}
-enum edbValueType edbcmd_getValueType( char *InputString )
-{
-	if( strcmp( InputString , "byte" ) == 0 )
-		return edbValueTypeByte ;
-	else if( strcmp( InputString , "integer" ) == 0 )
-		return edbValueTypeInteger ; 
-	else if( strcmp( InputString , "float" ) == 0 )
-		return edbValueTypeFloat ; 
-	else if( strcmp( InputString , "file" ) == 0 )
-		return edbValueTypeFile ;
-	
-	return edbValueTypeNull ;
 }
 
 void edbcmd_printError( struct edbError *Error )
@@ -448,17 +413,7 @@ void edbcmd_printError( struct edbError *Error )
 		case edbErrorNodeLookingupNothing : 
 			printf( "can't found the node.\n" ) ;
 		break ;
-		
-		case edbErrorValueDefinitionParameter : 
-			printf( "some parameters are wrong for defining a value.\n" ) ;
-		break ;
-		case edbErrorValueDefinitionAllocation : 
-			printf( "can't allocate a value for defining a value.\n" ) ;
-		break ;
-		case edbErrorValueUndefinitionParameter : 
-			printf( "some parameters are wrong for undefining a value.\n" ) ;
-		break ;
-		
+	
 		default : 
 			printf( "unknown error.\n" ) ;
 	}
@@ -492,22 +447,172 @@ void edbcmd_printNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountTyp
 	printf( "}\n" ) ;
 }
 
-void edbcmd_writeValueFile( FILE *ValueFile )
+void edbcmd_writeValueFile( struct edbPropertyValue *Value )
 {
-	wchar_t BufferString[ 256 ] ;
+	char BufferString[ 256 ] ;
+	FILE *ValueFile = fopen( Value->Name , "w" ) ;
+	if( ValueFile == plibCommonNullPointer )
+	{
+		printf( "edbcmd>there are some problems to open a file.\n" ) ;
+		return ;
+	}
 	
-	printf( "File>\n" ) ;
-	wscanf( L"%s" , BufferString ) ;
-	rewind( ValueFile ) ;
-	fputws( BufferString , ValueFile ) ;
-	fflush( ValueFile ) ;
+	printf( "Content>\n" ) ;
+	scanf( "%s" , BufferString ) ;
+	fputs( BufferString , ValueFile ) ;
+	fclose( ValueFile ) ;
 }
-void edbcmd_readValueFile( FILE *ValueFile )
+void edbcmd_readValueFile( struct edbPropertyValue *Value )
 {
-	wchar_t BufferString[ 256 ] ;
+	char BufferString[ 256 ] ;
+	FILE *ValueFile = fopen( Value->Name , "r" ) ;
+	if( ValueFile == plibCommonNullPointer )
+	{
+		printf( "edbcmd>there is no value file.\n" ) ;
+		return ;
+	}
 	
-	printf( "File>\n" ) ;
-	rewind( ValueFile ) ;
-	fgetws( BufferString , 256 , ValueFile ) ;
-	wprintf( L"%s\n" , BufferString ) ;
+	printf( "Content>\n" ) ;
+	fgets( BufferString , 256 , ValueFile ) ;
+	printf( "%s\n" , BufferString ) ;
+	fclose( ValueFile ) ;
+}
+void edbcmd_flushValueFileFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error )
+{
+	if( Index == edbNodeObject )
+		return ;
+	
+	struct edbPropertyValue *Value = ( struct edbPropertyValue* )TraversedNode->Value ;
+	remove( Value->Name ) ;
+}
+
+struct edbDB* edbcmd_readDB( char *DBNameString )
+{
+	if( DBNameString == plibCommonNullPointer )
+	{
+		printf( "edbcmd>db name is null.\n" ) ;
+		return plibCommonNullPointer ;
+	}
+	
+	struct edbcmdFileDB FileDB ;
+	struct edbcmdFileNode FileNode ;
+	
+	struct edbDB *DB ;
+	struct plibDataHBST *WorkingObject , *TempNode ;
+	struct edbPropertyValue *TempValue ;
+	
+	FILE *File = fopen( DBNameString , "rb" ) ;
+	if( File == plibCommonNullPointer )
+	{
+		printf( "edbcmd>there are some problems to read a db from a file.\n" ) ;
+		return plibCommonNullPointer ;
+	}
+	
+	// db
+	fread( &FileDB , sizeof( struct edbcmdFileDB ) , 1 , File ) ;
+	DB = edb_createDB( FileDB.ObjectMaxCount , FileDB.PropertyMaxCount , plibCommonNullPointer ) ;
+	if( DB == plibCommonNullPointer )
+		goto ErrorCreation ;
+	WorkingObject = DB->ObjectRootNode ;
+	
+	// node
+	Creation : 
+		fread( &FileNode , sizeof( struct edbcmdFileNode ) , 1 , File ) ;
+		if( feof( File ) )
+			goto Termination ;
+			
+		// moving up if the super key is different
+		while( FileNode.SuperKey != *( edbKeyType* )WorkingObject->Key )
+			WorkingObject = WorkingObject->Super ;
+		
+		switch( FileNode.SuperIndex )
+		{
+			case edbNodeObject : 
+				TempNode = edb_createNode( DB , WorkingObject , false , ( plibCommonAnyType* )( &FileNode.Key ) , plibCommonNullPointer ) ;
+				if( TempNode == plibCommonNullPointer )
+					goto ErrorCreation ;
+				
+				if( FileNode.SubFlag )
+					WorkingObject = TempNode ;
+			break ;
+			case edbNodeProperty :
+				TempNode = edb_createNode( DB , WorkingObject , true , ( plibCommonAnyType* )( &FileNode.Key ) , plibCommonNullPointer ) ;
+				if( TempNode == plibCommonNullPointer )
+					goto ErrorCreation ;
+				TempValue = ( struct edbPropertyValue* )TempNode->Value ;
+				
+				// value
+				fread( &TempValue->Type , sizeof( uint8_t ) , 1 , File ) ;
+				fread( TempValue->Name , sizeof( char ) , edbValueNameLength , File ) ;
+			break ;
+		}
+		goto Creation ;
+	
+	// ErrorCreation
+	ErrorCreation : 
+		if( DB != plibCommonNullPointer )
+		{
+			edb_deleteDB( &DB , plibCommonNullPointer ) ;
+			DB = plibCommonNullPointer ;
+		}
+		printf( "edbcmd>there are some problems to read a db.\n" ) ;
+		fclose( File ) ;
+	
+	// Termination
+	Termination : 
+		return DB ;
+}
+void edbcmd_writeDB( struct edbDB *DB , char *DBNameString )
+{
+	if( DB == plibCommonNullPointer )
+	{
+		printf( "edbcmd>db is null.\n" ) ;
+		return ;
+	}
+	
+	struct edbcmdFileDB FileDB ;
+	
+	FILE *File = fopen( DBNameString , "wb" ) ;
+	if( File == plibCommonNullPointer )
+	{
+		printf( "edbcmd>there are some problems to write a db to a file.\n" ) ;
+		return ;
+	}
+	
+	// db
+	FileDB.ObjectMaxCount = DB->ObjectMaxCount ;
+	FileDB.PropertyMaxCount = DB->PropertyMaxCount ;
+	FileDB.ObjectRootKey = *( edbKeyType* )DB->ObjectRootNode->Key ;
+	fwrite( &FileDB , sizeof( struct edbcmdFileDB ) , 1 , File ) ;
+	
+	// node
+	if( DB->ObjectRootNode->Sub != plibCommonNullPointer )
+		plibDataHBST_traverse( DB->ObjectRootNode->Sub[ edbNodeObject ].RootNode , edbcmd_writeNodeFx , ( plibCommonAnyType* )File , plibCommonNullPointer ) ;
+	
+	fclose( File ) ;
+	return ;
+}
+void edbcmd_writeNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error )
+{
+	FILE *File = ( FILE* )Data ;
+	struct edbcmdFileNode FileNode ;
+	struct edbPropertyValue *Value ;
+	
+	// node
+	FileNode.SuperIndex = Index ;
+	if( TraversedNode->Super == plibCommonNullPointer )
+		FileNode.SuperKey = ( edbKeyType )0 ;
+	else
+		FileNode.SuperKey = *( edbKeyType* )TraversedNode->Super->Key ;
+	FileNode.Key = *( edbKeyType* )TraversedNode->Key ;
+	FileNode.SubFlag = TraversedNode->SubLength == 0 ? false : true ;
+	fwrite( &FileNode , sizeof( struct edbcmdFileNode ) , 1 , File ) ;
+	
+	// value
+	if( Index == edbNodeProperty )
+	{
+		Value = ( struct edbPropertyValue* )TraversedNode->Value ;
+		fwrite( &Value->Type , sizeof( uint8_t ) , 1 , File ) ;
+		fwrite( &Value->Name , sizeof( char ) , edbValueNameLength , File ) ;
+	}
 }

@@ -4,12 +4,10 @@
 #pragma once
 #include "../edb.h"
 #include <string.h>
-#include <wchar.h>
-#include <locale.h>
 #include <unistd.h>
 
 #define edbcmdStringMaxLength 32
-#define edbcmdDirectoryValue "edbValue"
+#define edbcmdWorkingDirectory "edbcmd"
 
 enum edbcmdCommand
 {
@@ -35,8 +33,8 @@ enum edbcmdCommand
 	edbcmdCommandwriteValue , 
 	edbcmdCommandreadValue , 
 	
-	edbcmdCommandLoadDB , //
-	edbcmdCommandSaveDB //
+	edbcmdCommandLoadDB , 
+	edbcmdCommandSaveDB 
 } ;
 
 struct edbcmdStatus
@@ -46,15 +44,31 @@ struct edbcmdStatus
 	struct plibDataHBST *WorkingObject , *WorkingProperty ;
 } ;
 
+struct edbcmdFileDB
+{
+	plibCommonCountType ObjectMaxCount , PropertyMaxCount ;
+	edbKeyType ObjectRootKey ;
+} ;
+struct edbcmdFileNode
+{
+	plibCommonCountType SuperIndex ;
+	edbKeyType SuperKey , Key ;
+	bool SubFlag ;
+} ;
+
 void edbcmd_run(  ) ;
 
 bool edbcmd_initializeStatus( struct edbcmdStatus *Status ) ;
 
 enum edbcmdCommand edbcmd_getCommand( char *InputString ) ;
-enum edbValueType edbcmd_getValueType( char *InputString ) ;
 
 void edbcmd_printError( struct edbError *Error ) ;
 void edbcmd_printNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error ) ;
 
-void edbcmd_writeValueFile( FILE *ValueFile ) ;
-void edbcmd_readValueFile( FILE *ValueFile ) ;
+void edbcmd_writeValueFile( struct edbPropertyValue *Value ) ;
+void edbcmd_readValueFile( struct edbPropertyValue *Value ) ;
+void edbcmd_flushValueFileFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error ) ;
+
+struct edbDB* edbcmd_readDB( char *DBNameString ) ;
+void edbcmd_writeDB( struct edbDB *DB , char *DBNameString ) ;
+void edbcmd_writeNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error ) ;

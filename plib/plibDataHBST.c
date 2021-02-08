@@ -27,13 +27,13 @@ void plibDataHBST_initialize( struct plibDataHBST *Node , struct plibErrorType *
 	Node->Sub = plibCommonNullPointer ;
 }
 
-void plibDataHBST_push( struct plibDataHBST **EntryNode , struct plibDataHBST *NewNode , plibDataHBSTStatusFxType StatusFx , struct plibErrorType *Error )
+bool plibDataHBST_push( struct plibDataHBST **EntryNode , struct plibDataHBST *NewNode , plibDataHBSTStatusFxType StatusFx , struct plibErrorType *Error )
 {
 	// error
 	if( EntryNode == plibCommonNullPointer || NewNode == plibCommonNullPointer || StatusFx == plibCommonNullPointer )
 	{
 		plibError_report( Error , plibErrorTypeParameter , plibDataHBST_push ) ;
-		return ;
+		return false ;
 	}
 	
 	struct plibDataHBST *ThisNode = *EntryNode ;
@@ -52,7 +52,7 @@ void plibDataHBST_push( struct plibDataHBST **EntryNode , struct plibDataHBST *N
 						// pointing a new node on Left and this node on Top
 						ThisNode->Left = NewNode ;
 						NewNode->Top = ThisNode ;
-						return ;
+						return true ;
 					}
 					
 					ThisNode = ThisNode->Left ;
@@ -63,7 +63,7 @@ void plibDataHBST_push( struct plibDataHBST **EntryNode , struct plibDataHBST *N
 						// pointing a new node on Right and this node on Top
 						ThisNode->Right = NewNode ;
 						NewNode->Top = ThisNode ;
-						return ;
+						return true ;
 					}
 					
 					ThisNode = ThisNode->Right ;
@@ -73,11 +73,13 @@ void plibDataHBST_push( struct plibDataHBST **EntryNode , struct plibDataHBST *N
 				default : 
 					// error
 					plibError_report( Error , plibErrorTypeProcess , plibDataHBST_push ) ;
-					return ;
+					return false ;
 			}
 		}
 		while( ThisNode != plibCommonNullPointer ) ;
 	}
+	
+	return true ;
 }
 struct plibDataHBST* plibDataHBST_pop( struct plibDataHBST **EntryNode , plibCommonAnyType *Key , plibDataHBSTStatusFxType StatusFx , struct plibErrorType *Error )
 {
@@ -235,30 +237,31 @@ struct plibDataHBST* plibDataHBST_lookup( struct plibDataHBST *ThisNode , plibCo
 	return plibCommonNullPointer ;
 }
 
-void plibDataHBST_pushSub( struct plibDataHBST *SuperNode , plibCommonCountType Index , struct plibDataHBST *NewNode , plibDataHBSTStatusFxType StatusFx , struct plibErrorType *Error )
+bool plibDataHBST_pushSub( struct plibDataHBST *SuperNode , plibCommonCountType Index , struct plibDataHBST *NewNode , plibDataHBSTStatusFxType StatusFx , struct plibErrorType *Error )
 {
 	// error
 	if( SuperNode == plibCommonNullPointer )
 	{
 		plibError_report( Error , plibErrorTypeParameter , plibDataHBST_pushSub ) ;
-		return ;
+		return false ;
 	}
 	else if( Index >= SuperNode->SubLength )
 	{
 		plibError_report( Error , plibErrorTypeParameter , plibDataHBST_pushSub ) ;
-		return ;
+		return false ;
 	}
 	
-	plibDataHBST_push( &( SuperNode->Sub[ Index ].RootNode ) , NewNode , StatusFx , Error ) ;
-	if( Error->Type != plibErrorTypeNull )
+	if( plibDataHBST_push( &( SuperNode->Sub[ Index ].RootNode ) , NewNode , StatusFx , Error ) == false )
 	{
 		plibError_report( Error , plibErrorTypeProcess , plibDataHBST_pushSub ) ;
-		return ;
+		return false ;
 	}
 	
 	NewNode->SuperIndex = Index ;
 	NewNode->Super = SuperNode ;
 	SuperNode->Sub[ Index ].Count ++ ;
+	
+	return true ;
 }
 struct plibDataHBST* plibDataHBST_popSub( struct plibDataHBST *SuperNode , plibCommonCountType Index , plibCommonAnyType *Key , plibDataHBSTStatusFxType StatusFx , struct plibErrorType *Error )
 {
@@ -277,7 +280,7 @@ struct plibDataHBST* plibDataHBST_popSub( struct plibDataHBST *SuperNode , plibC
 	struct plibDataHBST *OldNode = plibDataHBST_pop( &( SuperNode->Sub[ Index ].RootNode ) , Key , StatusFx , Error ) ;
 	
 	// error
-	if( Error->Type != plibErrorTypeNull )
+	if( OldNode == plibCommonNullPointer )
 	{
 		plibError_report( Error , plibErrorTypeProcess , plibDataHBST_popSub ) ;
 		return plibCommonNullPointer ;
@@ -286,13 +289,13 @@ struct plibDataHBST* plibDataHBST_popSub( struct plibDataHBST *SuperNode , plibC
 	SuperNode->Sub[ Index ].Count -- ;
 	return OldNode ;
 }
-void plibDataHBST_traverse( struct plibDataHBST *EntryNode , plibDataHBSTTraversalFxType TraversalFx , plibCommonAnyType *Data , struct plibErrorType *Error )
+bool plibDataHBST_traverse( struct plibDataHBST *EntryNode , plibDataHBSTTraversalFxType TraversalFx , plibCommonAnyType *Data , struct plibErrorType *Error )
 {
 	// error
 	if( TraversalFx == plibCommonNullPointer )
 	{
 		plibError_report( Error , plibErrorTypeParameter , plibDataHBST_traverse ) ;
-		return ;
+		return false ;
 	}
 	
 	struct plibDataHBST *TempNode = EntryNode ;
@@ -356,4 +359,6 @@ void plibDataHBST_traverse( struct plibDataHBST *EntryNode , plibDataHBSTTravers
 		
 		// no nodes to visit
 	}
+	
+	return true ;
 }

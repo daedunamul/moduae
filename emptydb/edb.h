@@ -30,19 +30,7 @@ enum edbErrorType
 	edbErrorNodeCreationPushing , 
 	edbErrorNodeDeletionParameter , 
 	edbErrorNodeDeletionDeallocation , 
-	edbErrorNodeLookingupNothing , 
-	
-	edbErrorValueDefinitionParameter , 
-	edbErrorValueDefinitionAllocation , 
-	edbErrorValueUndefinitionParameter 
-} ;
-enum edbValueType
-{
-	edbValueTypeNull = 0 , 
-	edbValueTypeByte , // unsigned 1 byte
-	edbValueTypeInteger , // signed 4 byte
-	edbValueTypeFloat , // signed 4 byte
-	edbValueTypeFile // byte file stream
+	edbErrorNodeLookingupNothing 
 } ;
 
 struct edbError
@@ -58,7 +46,7 @@ struct edbDB
 } ;
 struct edbPropertyValue
 {
-	enum edbValueType Type ;
+	uint8_t Type ;
 	char Name[ edbValueNameLength ] ;
 	plibCommonAnyType *Data ;
 } ;
@@ -67,13 +55,9 @@ void edb_initializeError( struct edbError *Error ) ;
 void edb_reportError( struct edbError *Error , enum edbErrorType ErrorConstant ) ;
 
 struct edbDB* edb_createDB( plibCommonCountType ObjectMaxCount , plibCommonCountType PropertyMaxCount , struct edbError *Error ) ;
-void edb_deleteDB( struct edbDB **DB , struct edbError *Error ) ; // need to free values
+void edb_deleteDB( struct edbDB **DB , struct edbError *Error ) ;
 
 struct plibDataHBST* edb_createNode( struct edbDB *DB , struct plibDataHBST *SuperObject , bool SubNodeType , plibCommonAnyType *SubNodeKey , struct edbError *Error ) ;
 void edb_deleteNode( struct edbDB *DB , struct plibDataHBST *SuperObject , bool SubNodeType , plibCommonAnyType *SubNodeKey , struct edbError *Error ) ;
 void edb_flushNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error ) ;
 struct plibDataHBST* edb_lookupNode( struct edbDB *DB , struct plibDataHBST *SuperObject , bool SubNodeType , plibCommonAnyType *SubNodeKey , struct edbError *Error ) ;
-
-void edb_defineValue( struct plibDataHBST *Property , enum edbValueType Type , struct edbError *Error ) ;
-void edb_undefineValue( struct plibDataHBST *Property , struct edbError *Error ) ;
-void edb_flushValueFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error ) ;
