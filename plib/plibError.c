@@ -3,15 +3,15 @@
 */
 #include "plibError.h"
 
-void plibError_initialize( struct plibErrorType *Error )
+void plibError_initialize( struct plibError *Error )
 {
 	if( Error == plibCommonNullPointer )
 		return ;
 	
-	Error->Type = plibErrorTypeNull ;
+	Error->Type = plibErrorNull ;
 	Error->Address = plibCommonNullPointer ;
 }
-void plibError_report( struct plibErrorType *Error , uint8_t Type , void *Address )
+void plibError_report( struct plibError *Error , uint8_t Type , void *Address )
 {
 	if( Error == plibCommonNullPointer )
 		return ;

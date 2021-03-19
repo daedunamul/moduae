@@ -6,16 +6,16 @@
 
 enum 
 {
-	plibErrorTypeNull = 0 , 
-	plibErrorTypeParameter , 
-	plibErrorTypeProcess 
+	plibErrorNull = 0 , 
+	plibErrorParameter , 
+	plibErrorProcess 
 } ;
 
-struct plibErrorType
+struct plibError
 {
 	uint8_t Type ;
 	void *Address ;
 } ;
 
-void plibError_initialize( struct plibErrorType *Error ) ;
-void plibError_report( struct plibErrorType *Error , uint8_t Type , void *Address ) ;
+void plibError_initialize( struct plibError *Error ) ;
+void plibError_report( struct plibError *Error , uint8_t Type , void *Address ) ;

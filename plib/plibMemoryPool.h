@@ -11,10 +11,10 @@ struct plibMemoryPool
 	plibCommonAnyType **AddressStack ;
 } ;
 
-void plibMemoryPool_initialize( struct plibMemoryPool *Pool , struct plibErrorType *Error ) ;
+void plibMemoryPool_initialize( struct plibMemoryPool *Pool , struct plibError *Error ) ;
 
-struct plibMemoryPool* plibMemoryPool_create( plibCommonCountType UnitSize , plibCommonCountType MaxCount , struct plibErrorType *Error ) ;
-void plibMemoryPool_delete( struct plibMemoryPool **Pool , struct plibErrorType *Error ) ;
+struct plibMemoryPool* plibMemoryPool_create( plibCommonCountType UnitSize , plibCommonCountType MaxCount , struct plibError *Error ) ;
+void plibMemoryPool_delete( struct plibMemoryPool **Pool , struct plibError *Error ) ;
 
-plibCommonAnyType* plibMemoryPool_allocate( struct plibMemoryPool *Pool , struct plibErrorType *Error ) ;
-void plibMemoryPool_deallocate( struct plibMemoryPool *Pool , plibCommonAnyType **UsedAddress , struct plibErrorType *Error ) ;
+plibCommonAnyType* plibMemoryPool_allocate( struct plibMemoryPool *Pool , struct plibError *Error ) ;
+void plibMemoryPool_deallocate( struct plibMemoryPool *Pool , plibCommonAnyType **UsedAddress , struct plibError *Error ) ;

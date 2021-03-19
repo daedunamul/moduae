@@ -3,92 +3,89 @@
 */
 #include "plibDataTube.h"
 
-void plibDataTube_push( bool Direction , struct plibDataTube **EntryNode , struct plibDataTube *NewNode , struct plibErrorType *Error )
+void plibDataTube_initialize( struct plibDataTube *Tube , struct plibError *Error )
 {
 	// error
-	if( EntryNode == plibCommonNullPointer || NewNode == plibCommonNullPointer )
+	if( Tube == plibCommonNullPointer )
 	{
-		plibError_report( Error , plibErrorTypeParameter , plibDataTube_push ) ;
+		plibError_report( Error , plibErrorParameter , plibDataTube_initialize ) ;
 		return ;
 	}
 	
-	if( *EntryNode == plibCommonNullPointer )
+	Tube->EntryNode = plibCommonNullPointer ;
+	Tube->Count = 0 ;
+}
+
+void plibDataTube_push( bool Direction , struct plibDataTube *Tube , struct plibDataNode *NewNode , struct plibError *Error )
+{
+	// error
+	if( Tube == plibCommonNullPointer || NewNode == plibCommonNullPointer )
 	{
-		NewNode->Left = NewNode ;
-		NewNode->Right = NewNode ;
-		*EntryNode = NewNode ;
+		plibError_report( Error , plibErrorParameter , plibDataTube_push ) ;
+		return ;
 	}
+	
+	if( Tube->EntryNode == plibCommonNullPointer )
+		plibData_linkNode( 2 , NewNode , NewNode ) ;
 	else
 	{
 		if( Direction )
 		{
 			// Right : EntryNode ... EntryNode.Left-NewNode-EntryNode
-			NewNode->Left = ( *EntryNode )->Left ;
-			NewNode->Right = *EntryNode ;
-			
-			( *EntryNode )->Left = NewNode ;
+			plibData_linkNode( 3 , Tube->EntryNode->Left , NewNode , Tube->EntryNode ) ;
 		}
 		else
 		{
 			// Left : EntryNode ... EntryNode-NewNode-EntryNode.Right
-			NewNode->Left = *EntryNode ;
-			NewNode->Right = ( *EntryNode )->Right ;
-		
-			( *EntryNode )->Right = NewNode ;
+			plibData_linkNode( 3 , Tube->EntryNode , NewNode , Tube->EntryNode->Right ) ;
 		}
 	}
+	Tube->EntryNode = NewNode ;
+	Tube->Count ++ ;
 }
-struct plibDataTube* plibDataTube_pop( bool Direction , struct plibDataTube **EntryNode , struct plibErrorType *Error )
+struct plibDataNode* plibDataTube_pop( bool Direction , struct plibDataTube *Tube , struct plibError *Error )
 {
 	// error
-	if( EntryNode == plibCommonNullPointer || *EntryNode == plibCommonNullPointer )
+	if( Tube == plibCommonNullPointer || Tube->EntryNode == plibCommonNullPointer )
 	{
-		plibError_report( Error , plibErrorTypeParameter , plibDataTube_pop ) ;
+		plibError_report( Error , plibErrorParameter , plibDataTube_pop ) ;
 		return plibCommonNullPointer ;
 	}
 	
-	struct plibDataTube* OldNode ;
+	struct plibDataNode* OldNode = Tube->EntryNode ;
 	
-	if( ( *EntryNode )->Left == ( *EntryNode )->Right )
-	{
-		OldNode = *EntryNode ;
-		*EntryNode = plibCommonNullPointer ;
-	}
+	if( Tube->Count == 1 )
+		Tube->EntryNode = plibCommonNullPointer ;
 	else
 	{
-		OldNode = *EntryNode ;
-		
+		// OldNode.Left-OldNode.Right ... OldNode
+		plibData_linkNode( 2 , OldNode->Left , OldNode->Right ) ;
 		if( Direction )
 		{
-			// Right : OldNode.Left-OldNode-OldNode.Right ... OldNode.Left-EntryNode
-			( *EntryNode )->Right->Left = ( *EntryNode )->Left ;
-			*EntryNode = ( *EntryNode )->Right ;
-			if( *EntryNode == ( *EntryNode )->Left )
-				( *EntryNode )->Right = *EntryNode ;
+			// Right : OldNode.Left-EntryNode
+			Tube->EntryNode = OldNode->Right ;
 		}
 		else
 		{
-			// Left : OldNode.Left-OldNode-OldNode.Right ... EntryNode-OldNode.Right
-			( *EntryNode )->Left->Right = ( *EntryNode )->Right ;
-			*EntryNode = ( *EntryNode )->Left ;
-			if( *EntryNode == ( *EntryNode )->Right )
-				( *EntryNode )->Left = *EntryNode ;
+			// Left : EntryNode-OldNode.Right
+			Tube->EntryNode = OldNode->Left ;
 		}
 	}
+	Tube->Count -- ;
 	
 	return OldNode ;
 }
 
-void plibDataTube_iterate( bool Direction , struct plibDataTube *EntryNode , plibDataTubeIterationFxType IterationFx , struct plibErrorType *Error )
+void plibDataTube_iterate( bool Direction , struct plibDataTube *Tube , plibDataTubeIterationFxType IterationFx , struct plibError *Error )
 {
 	// error
-	if( EntryNode == plibCommonNullPointer || IterationFx == plibCommonNullPointer )
+	if( Tube == plibCommonNullPointer || Tube->EntryNode == plibCommonNullPointer || IterationFx == plibCommonNullPointer )
 	{
-		plibError_report( Error , plibErrorTypeParameter , plibDataTube_iterate ) ;
-		return plibCommonNullPointer ;
+		plibError_report( Error , plibErrorParameter , plibDataTube_iterate ) ;
+		return ;
 	}
 	
-	struct plibDataTube *ThisNode = EntryNode ;
+	struct plibDataNode *ThisNode = Tube->EntryNode ;
 	plibCommonCountType Count = 0 ; 
 	
 	if( Direction )
@@ -99,7 +96,7 @@ void plibDataTube_iterate( bool Direction , struct plibDataTube *EntryNode , pli
 			ThisNode = ThisNode->Right ;
 			Count ++ ;
 		}
-		while( ThisNode != EntryNode ) ;
+		while( ThisNode != Tube->EntryNode ) ;
 	}
 	else
 	{
@@ -109,6 +106,22 @@ void plibDataTube_iterate( bool Direction , struct plibDataTube *EntryNode , pli
 			ThisNode = ThisNode->Left ;
 			Count ++ ;
 		}
-		while( ThisNode != EntryNode ) ;
+		while( ThisNode != Tube->EntryNode ) ;
 	}
+}
+struct plibDataNode* plibDataTube_index( struct plibDataTube *Tube , plibCommonCountType Index , struct plibError *Error )
+{
+	// error
+	if( Tube == plibCommonNullPointer || Tube->EntryNode == plibCommonNullPointer || Index >= Tube->Count )
+	{
+		plibError_report( Error , plibErrorParameter , plibDataTube_index ) ;
+		return plibCommonNullPointer ;
+	}
+	
+	struct plibDataNode *TempNode ;
+	
+	for( TempNode = Tube->EntryNode ; Index > 0 ; Index -- )
+		TempNode = TempNode->Right ;
+	
+	return TempNode ;
 }

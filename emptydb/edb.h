@@ -15,7 +15,7 @@ enum
 	edbNodeProperty 
 } ;
 
-enum edbErrorType
+enum edbError
 {
 	edbErrorNull = 0 , 
 	
@@ -33,10 +33,10 @@ enum edbErrorType
 	edbErrorNodeLookingupNothing 
 } ;
 
-struct edbError
+struct edbStatus
 {
-	enum edbErrorType Error ;
-	struct plibErrorType InternalError ;
+	enum edbError Error ;
+	struct plibError InternalError ;
 } ;
 struct edbDB
 {
@@ -51,13 +51,13 @@ struct edbPropertyValue
 	plibCommonAnyType *Data ;
 } ;
 
-void edb_initializeError( struct edbError *Error ) ;
-void edb_reportError( struct edbError *Error , enum edbErrorType ErrorConstant ) ;
+void edb_initializeStatus( struct edbStatus *Status ) ;
+void edb_reportStatus( struct edbStatus *Status , enum edbError ErrorConstant ) ;
 
-struct edbDB* edb_createDB( plibCommonCountType ObjectMaxCount , plibCommonCountType PropertyMaxCount , struct edbError *Error ) ;
-void edb_deleteDB( struct edbDB **DB , struct edbError *Error ) ;
+struct edbDB* edb_createDB( plibCommonCountType ObjectMaxCount , plibCommonCountType PropertyMaxCount , struct edbStatus *Status ) ;
+void edb_deleteDB( struct edbDB **DB , struct edbStatus *Status ) ;
 
-struct plibDataHBST* edb_createNode( struct edbDB *DB , struct plibDataHBST *SuperObject , bool SubNodeType , plibCommonAnyType *SubNodeKey , struct edbError *Error ) ;
-void edb_deleteNode( struct edbDB *DB , struct plibDataHBST *SuperObject , bool SubNodeType , plibCommonAnyType *SubNodeKey , struct edbError *Error ) ;
-void edb_flushNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error ) ;
-struct plibDataHBST* edb_lookupNode( struct edbDB *DB , struct plibDataHBST *SuperObject , bool SubNodeType , plibCommonAnyType *SubNodeKey , struct edbError *Error ) ;
+struct plibDataHBST* edb_createNode( struct edbDB *DB , struct plibDataHBST *SuperObject , bool SubNodeType , plibCommonAnyType *SubNodeKey , struct edbStatus *Status ) ;
+void edb_deleteNode( struct edbDB *DB , struct plibDataHBST *SuperObject , bool SubNodeType , plibCommonAnyType *SubNodeKey , struct edbStatus *Status ) ;
+void edb_flushNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibError *Status ) ;
+struct plibDataHBST* edb_lookupNode( struct edbDB *DB , struct plibDataHBST *SuperObject , bool SubNodeType , plibCommonAnyType *SubNodeKey , struct edbStatus *Status ) ;

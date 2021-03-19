@@ -39,7 +39,7 @@ enum edbcmdCommand
 
 struct edbcmdStatus
 {
-	struct edbError Error ;
+	struct edbStatus DBStatus ;
 	struct edbDB *WorkingDB ;
 	struct plibDataHBST *WorkingObject , *WorkingProperty ;
 } ;
@@ -62,13 +62,13 @@ bool edbcmd_initializeStatus( struct edbcmdStatus *Status ) ;
 
 enum edbcmdCommand edbcmd_getCommand( char *InputString ) ;
 
-void edbcmd_printError( struct edbError *Error ) ;
-void edbcmd_printNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error ) ;
+void edbcmd_printStatus( struct edbStatus *DBStatus ) ;
+void edbcmd_printNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibError *Error ) ;
 
 void edbcmd_writeValueFile( struct edbPropertyValue *Value ) ;
 void edbcmd_readValueFile( struct edbPropertyValue *Value ) ;
-void edbcmd_flushValueFileFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error ) ;
+void edbcmd_flushValueFileFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibError *Error ) ;
 
 struct edbDB* edbcmd_readDB( char *DBNameString ) ;
 void edbcmd_writeDB( struct edbDB *DB , char *DBNameString ) ;
-void edbcmd_writeNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error ) ;
+void edbcmd_writeNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibError *Error ) ;

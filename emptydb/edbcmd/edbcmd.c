@@ -27,7 +27,7 @@ void edbcmd_run(  )
 		switch( Command )
 		{
 			case edbcmdCommandQuit : 
-				edb_deleteDB( &Status.WorkingDB , &Status.Error ) ;
+				edb_deleteDB( &Status.WorkingDB , &Status.DBStatus ) ;
 				continue ;
 			
 			case edbcmdCommandShowStatus : 
@@ -53,7 +53,7 @@ void edbcmd_run(  )
 				}
 				
 				printf( "edbcmd>\n" ) ;
-				plibDataHBST_traverse( Status.WorkingDB->ObjectRootNode , edbcmd_printNodeFx , plibCommonNullPointer , &Status.Error.InternalError ) ;
+				plibDataHBST_traverse( Status.WorkingDB->ObjectRootNode , edbcmd_printNodeFx , plibCommonNullPointer , &Status.DBStatus.InternalError ) ;
 			break ;
 			
 			case edbcmdCommandCreateDB : 
@@ -65,11 +65,11 @@ void edbcmd_run(  )
 				
 				printf( "ObjectMaxCount PropertyMaxCount>\n" ) ;
 				scanf( "%d%d" , &Temp1 , &Temp2 ) ;
-				Status.WorkingDB = edb_createDB( ( plibCommonCountType )Temp1 , ( plibCommonCountType )Temp2 , &Status.Error ) ;
-				if( Status.Error.Error == edbErrorNull )
+				Status.WorkingDB = edb_createDB( ( plibCommonCountType )Temp1 , ( plibCommonCountType )Temp2 , &Status.DBStatus ) ;
+				if( Status.DBStatus.Error == edbErrorNull )
 					Status.WorkingObject = Status.WorkingDB->ObjectRootNode ;
 				
-				edbcmd_printError( &Status.Error ) ;
+				edbcmd_printStatus( &Status.DBStatus ) ;
 			break ;
 			case edbcmdCommandCreateObject : 
 				if( Status.WorkingDB == plibCommonNullPointer )
@@ -85,9 +85,9 @@ void edbcmd_run(  )
 				
 				printf( "Key>" ) ;
 				scanf( "%d" , &TempKey ) ;
-				edb_createNode( Status.WorkingDB , Status.WorkingObject , false , ( plibCommonAnyType* )( &TempKey ) , &Status.Error ) ;
+				edb_createNode( Status.WorkingDB , Status.WorkingObject , false , ( plibCommonAnyType* )( &TempKey ) , &Status.DBStatus ) ;
 				
-				edbcmd_printError( &Status.Error ) ;
+				edbcmd_printStatus( &Status.DBStatus ) ;
 			break ;
 			case edbcmdCommandCreateProperty : 
 				if( Status.WorkingDB == plibCommonNullPointer )
@@ -103,9 +103,9 @@ void edbcmd_run(  )
 				
 				printf( "Key>\n" ) ;
 				scanf( "%d" , &TempKey ) ;
-				edb_createNode( Status.WorkingDB , Status.WorkingObject , true , ( plibCommonAnyType* )( &TempKey ) , &Status.Error ) ;
+				edb_createNode( Status.WorkingDB , Status.WorkingObject , true , ( plibCommonAnyType* )( &TempKey ) , &Status.DBStatus ) ;
 				
-				edbcmd_printError( &Status.Error ) ;
+				edbcmd_printStatus( &Status.DBStatus ) ;
 			break ;
 			
 			case edbcmdCommandDeleteDB : 
@@ -115,10 +115,10 @@ void edbcmd_run(  )
 					continue ;
 				}
 				
-				edb_deleteDB( &Status.WorkingDB , &Status.Error ) ;
+				edb_deleteDB( &Status.WorkingDB , &Status.DBStatus ) ;
 				edbcmd_initializeStatus( &Status ) ;
 				
-				edbcmd_printError( &Status.Error ) ;
+				edbcmd_printStatus( &Status.DBStatus ) ;
 			break ;
 			case edbcmdCommandDeleteObject : 
 				if( Status.WorkingDB == plibCommonNullPointer )
@@ -134,10 +134,10 @@ void edbcmd_run(  )
 				
 				printf( "Key>" ) ;
 				scanf( "%d" , &TempKey ) ;
-				plibDataHBST_traverse( Status.WorkingObject , edbcmd_flushValueFileFx , plibCommonNullPointer , &Status.Error.InternalError ) ;
-				edb_deleteNode( Status.WorkingDB , Status.WorkingObject , false , ( plibCommonAnyType* )( &TempKey ) , &Status.Error ) ;
+				plibDataHBST_traverse( Status.WorkingObject , edbcmd_flushValueFileFx , plibCommonNullPointer , &Status.DBStatus.InternalError ) ;
+				edb_deleteNode( Status.WorkingDB , Status.WorkingObject , false , ( plibCommonAnyType* )( &TempKey ) , &Status.DBStatus ) ;
 				
-				edbcmd_printError( &Status.Error ) ;
+				edbcmd_printStatus( &Status.DBStatus ) ;
 			break ;
 			case edbcmdCommandDeleteProperty : 
 				if( Status.WorkingDB == plibCommonNullPointer )
@@ -153,11 +153,11 @@ void edbcmd_run(  )
 				
 				printf( "Key>" ) ;
 				scanf( "%d" , &TempKey ) ;
-				edbcmd_flushValueFileFx( edb_lookupNode( Status.WorkingDB , Status.WorkingObject , edbNodeProperty , ( plibCommonAnyType* )( &TempKey ) , &Status.Error ) , edbNodeProperty , plibCommonNullPointer , plibCommonNullPointer ) ;
-				edb_deleteNode( Status.WorkingDB , Status.WorkingObject , true , ( plibCommonAnyType* )( &TempKey ) , &Status.Error ) ;
+				edbcmd_flushValueFileFx( edb_lookupNode( Status.WorkingDB , Status.WorkingObject , edbNodeProperty , ( plibCommonAnyType* )( &TempKey ) , &Status.DBStatus ) , edbNodeProperty , plibCommonNullPointer , plibCommonNullPointer ) ;
+				edb_deleteNode( Status.WorkingDB , Status.WorkingObject , true , ( plibCommonAnyType* )( &TempKey ) , &Status.DBStatus ) ;
 				Status.WorkingProperty = plibCommonNullPointer ;
 				
-				edbcmd_printError( &Status.Error ) ;
+				edbcmd_printStatus( &Status.DBStatus ) ;
 			break ;
 			
 			case edbcmdCommandPointRoot : 
@@ -204,7 +204,7 @@ void edbcmd_run(  )
 				
 				printf( "Key>" ) ;
 				scanf( "%d" , &TempKey ) ;
-				TempNode = edb_lookupNode( Status.WorkingDB , Status.WorkingObject , false , ( plibCommonAnyType* )( &TempKey ) , &Status.Error ) ;
+				TempNode = edb_lookupNode( Status.WorkingDB , Status.WorkingObject , false , ( plibCommonAnyType* )( &TempKey ) , &Status.DBStatus ) ;
 				
 				if( TempNode == plibCommonNullPointer )
 				{
@@ -219,7 +219,7 @@ void edbcmd_run(  )
 					printf( "Key : %lu , SuperIndex : %u , SubCount : %u\n" , *( ( unsigned long* )Status.WorkingObject->Key ) , ( unsigned int )Status.WorkingObject->SuperIndex , ( unsigned int )Status.WorkingObject->Sub->Count ) ;
 				}
 				
-				edbcmd_printError( &Status.Error ) ;
+				edbcmd_printStatus( &Status.DBStatus ) ;
 			break ;
 			case edbcmdCommandPointProperty : 
 				if( Status.WorkingDB == plibCommonNullPointer )
@@ -235,7 +235,7 @@ void edbcmd_run(  )
 				
 				printf( "Key>" ) ;
 				scanf( "%d" , &TempKey ) ;
-				TempNode = edb_lookupNode( Status.WorkingDB , Status.WorkingObject , true , ( plibCommonAnyType* )( &TempKey ) , &Status.Error ) ;
+				TempNode = edb_lookupNode( Status.WorkingDB , Status.WorkingObject , true , ( plibCommonAnyType* )( &TempKey ) , &Status.DBStatus ) ;
 				
 				if( TempNode == plibCommonNullPointer )
 				{
@@ -249,7 +249,7 @@ void edbcmd_run(  )
 					printf( "Key : %lu , SuperIndex : %u\n" , *( ( unsigned long* )Status.WorkingProperty->Key ) , ( unsigned int )Status.WorkingProperty->SuperIndex ) ;
 				}
 				
-				edbcmd_printError( &Status.Error ) ;
+				edbcmd_printStatus( &Status.DBStatus ) ;
 			break ;
 			
 			case edbcmdCommandwriteValue : 
@@ -317,7 +317,7 @@ bool edbcmd_initializeStatus( struct edbcmdStatus *Status )
 	if( Status == plibCommonNullPointer )
 		return false ;
 	
-	edb_initializeError( &Status->Error ) ;
+	edb_initializeStatus( &Status->DBStatus ) ;
 	Status->WorkingDB = plibCommonNullPointer ;
 	Status->WorkingObject = plibCommonNullPointer ;
 	Status->WorkingProperty = plibCommonNullPointer ;
@@ -371,13 +371,13 @@ enum edbcmdCommand edbcmd_getCommand( char *InputString )
 	return edbcmdCommandNull ;
 }
 
-void edbcmd_printError( struct edbError *Error )
+void edbcmd_printStatus( struct edbStatus *DBStatus )
 {
-	if( Error->Error == edbErrorNull )
+	if( DBStatus->Error == edbErrorNull )
 		return ;
 	
 	printf( "edbcmd>an error occured.\n" ) ;
-	switch( Error->Error )
+	switch( DBStatus->Error )
 	{
 		case edbErrorDBCreationParameter : 
 			printf( "some parameters are wrong for creating a db.\n" ) ;
@@ -418,9 +418,9 @@ void edbcmd_printError( struct edbError *Error )
 			printf( "unknown error.\n" ) ;
 	}
 	
-	edb_initializeError( Error ) ;
+	edb_initializeStatus( DBStatus ) ;
 }
-void edbcmd_printNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error )
+void edbcmd_printNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibError *Error )
 {
 	if( Index == edbNodeObject )
 	{
@@ -477,7 +477,7 @@ void edbcmd_readValueFile( struct edbPropertyValue *Value )
 	printf( "%s\n" , BufferString ) ;
 	fclose( ValueFile ) ;
 }
-void edbcmd_flushValueFileFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error )
+void edbcmd_flushValueFileFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibError *Error )
 {
 	if( Index == edbNodeObject )
 		return ;
@@ -592,7 +592,7 @@ void edbcmd_writeDB( struct edbDB *DB , char *DBNameString )
 	fclose( File ) ;
 	return ;
 }
-void edbcmd_writeNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error )
+void edbcmd_writeNodeFx( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibError *Error )
 {
 	FILE *File = ( FILE* )Data ;
 	struct edbcmdFileNode FileNode ;

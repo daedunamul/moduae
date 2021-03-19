@@ -3,12 +3,12 @@
 */
 #include "plibMemoryPool.h"
 
-void plibMemoryPool_initialize( struct plibMemoryPool *Pool , struct plibErrorType *Error )
+void plibMemoryPool_initialize( struct plibMemoryPool *Pool , struct plibError *Error )
 {
 	// error
 	if( Pool == plibCommonNullPointer )
 	{
-		plibError_report( Error , plibErrorTypeParameter , plibMemoryPool_initialize ) ;
+		plibError_report( Error , plibErrorParameter , plibMemoryPool_initialize ) ;
 		return ;
 	}
 	
@@ -22,12 +22,12 @@ void plibMemoryPool_initialize( struct plibMemoryPool *Pool , struct plibErrorTy
 	}
 }
 
-struct plibMemoryPool* plibMemoryPool_create( plibCommonCountType UnitSize , plibCommonCountType MaxCount , struct plibErrorType *Error )
+struct plibMemoryPool* plibMemoryPool_create( plibCommonCountType UnitSize , plibCommonCountType MaxCount , struct plibError *Error )
 {
 	// error
 	if( UnitSize == 0 || MaxCount == 0 )
 	{
-		plibError_report( Error , plibErrorTypeParameter , plibMemoryPool_create ) ;
+		plibError_report( Error , plibErrorParameter , plibMemoryPool_create ) ;
 		return plibCommonNullPointer ;
 	}
 	
@@ -38,7 +38,7 @@ struct plibMemoryPool* plibMemoryPool_create( plibCommonCountType UnitSize , pli
 	if( NewPool == plibCommonNullPointer )
 	{
 		// error
-		plibError_report( Error , plibErrorTypeProcess , plibMemoryPool_create ) ;
+		plibError_report( Error , plibErrorProcess , plibMemoryPool_create ) ;
 		return plibCommonNullPointer ;
 	}
 	NewPool->AddressStart = ( plibCommonAnyType* )malloc( ( 1 + UnitSize ) * MaxCount ) ;
@@ -46,7 +46,7 @@ struct plibMemoryPool* plibMemoryPool_create( plibCommonCountType UnitSize , pli
 	{
 		// error
 		free( NewPool ) ;
-		plibError_report( Error , plibErrorTypeProcess , plibMemoryPool_create ) ;
+		plibError_report( Error , plibErrorProcess , plibMemoryPool_create ) ;
 		return plibCommonNullPointer ;
 	}
 	NewPool->AddressStack = ( plibCommonAnyType** )malloc( sizeof( plibCommonAnyType* ) * MaxCount ) ;
@@ -55,7 +55,7 @@ struct plibMemoryPool* plibMemoryPool_create( plibCommonCountType UnitSize , pli
 		// error
 		free( NewPool->AddressStart ) ;
 		free( NewPool ) ;
-		plibError_report( Error , plibErrorTypeProcess , plibMemoryPool_create ) ;
+		plibError_report( Error , plibErrorProcess , plibMemoryPool_create ) ;
 		return plibCommonNullPointer ;
 	}
 	
@@ -67,12 +67,12 @@ struct plibMemoryPool* plibMemoryPool_create( plibCommonCountType UnitSize , pli
 	
 	return NewPool ;
 }
-void plibMemoryPool_delete( struct plibMemoryPool **Pool , struct plibErrorType *Error )
+void plibMemoryPool_delete( struct plibMemoryPool **Pool , struct plibError *Error )
 {
 	// error
 	if( Pool == plibCommonNullPointer || *Pool == plibCommonNullPointer )
 	{
-		plibError_report( Error , plibErrorTypeParameter , plibMemoryPool_delete ) ;
+		plibError_report( Error , plibErrorParameter , plibMemoryPool_delete ) ;
 		return ;
 	}
 	
@@ -84,17 +84,17 @@ void plibMemoryPool_delete( struct plibMemoryPool **Pool , struct plibErrorType 
 	return ;
 }
 
-plibCommonAnyType* plibMemoryPool_allocate( struct plibMemoryPool *Pool , struct plibErrorType *Error )
+plibCommonAnyType* plibMemoryPool_allocate( struct plibMemoryPool *Pool , struct plibError *Error )
 {
 	// error
 	if( Pool == plibCommonNullPointer )
 	{
-		plibError_report( Error , plibErrorTypeParameter , plibMemoryPool_allocate ) ;
+		plibError_report( Error , plibErrorParameter , plibMemoryPool_allocate ) ;
 		return plibCommonNullPointer ;
 	}	
 	else if( Pool->Count == 0 )
 	{
-		plibError_report( Error , plibErrorTypeParameter , plibMemoryPool_allocate ) ;
+		plibError_report( Error , plibErrorParameter , plibMemoryPool_allocate ) ;
 		return plibCommonNullPointer ;
 	}
 	
@@ -103,22 +103,22 @@ plibCommonAnyType* plibMemoryPool_allocate( struct plibMemoryPool *Pool , struct
 	
 	return Pool->AddressStack[ Pool->Count ] + 1 ;
 }
-void plibMemoryPool_deallocate( struct plibMemoryPool *Pool , plibCommonAnyType **UsedAddress , struct plibErrorType *Error )
+void plibMemoryPool_deallocate( struct plibMemoryPool *Pool , plibCommonAnyType **UsedAddress , struct plibError *Error )
 {
 	// error
 	if( Pool == plibCommonNullPointer || UsedAddress == plibCommonNullPointer )
 	{
-		plibError_report( Error , plibErrorTypeParameter , plibMemoryPool_deallocate ) ;
+		plibError_report( Error , plibErrorParameter , plibMemoryPool_deallocate ) ;
 		return ;
 	}	
 	else if( *UsedAddress < Pool->AddressStart || *UsedAddress > Pool->AddressEnd )
 	{
-		plibError_report( Error , plibErrorTypeParameter , plibMemoryPool_deallocate ) ;
+		plibError_report( Error , plibErrorParameter , plibMemoryPool_deallocate ) ;
 		return ;
 	}
 	else if( *( *UsedAddress - 1 ) == false )
 	{
-		plibError_report( Error , plibErrorTypeParameter , plibMemoryPool_deallocate ) ;
+		plibError_report( Error , plibErrorParameter , plibMemoryPool_deallocate ) ;
 		return ;
 	}
 	

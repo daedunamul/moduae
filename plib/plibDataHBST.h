@@ -27,15 +27,15 @@ struct plibDataHBSTSub
 } ;
 
 typedef enum plibDataHBSTStatus ( *plibDataHBSTStatusFxType )( plibCommonAnyType *Key1 , plibCommonAnyType *Key2 ) ;
-typedef void ( *plibDataHBSTTraversalFxType )( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibErrorType *Error ) ;
+typedef void ( *plibDataHBSTTraversalFxType )( struct plibDataHBST *TraversedNode , plibCommonCountType Index , plibCommonAnyType *Data , struct plibError *Error ) ;
 
-void plibDataHBST_initialize( struct plibDataHBST *Node , struct plibErrorType *Error ) ;
+void plibDataHBST_initialize( struct plibDataHBST *Node , struct plibError *Error ) ;
 
-bool plibDataHBST_push( struct plibDataHBST **EntryNode , struct plibDataHBST *NewNode , plibDataHBSTStatusFxType StatusFx , struct plibErrorType *Error ) ;
-struct plibDataHBST* plibDataHBST_pop( struct plibDataHBST **EntryNode , plibCommonAnyType *Key , plibDataHBSTStatusFxType StatusFx , struct plibErrorType *Error ) ;
-struct plibDataHBST* plibDataHBST_lookup( struct plibDataHBST *ThisNode , plibCommonAnyType *Key , plibDataHBSTStatusFxType StatusFx , struct plibErrorType *Error ) ;
+bool plibDataHBST_push( struct plibDataHBST **EntryNode , struct plibDataHBST *NewNode , plibDataHBSTStatusFxType StatusFx , struct plibError *Error ) ;
+struct plibDataHBST* plibDataHBST_pop( struct plibDataHBST **EntryNode , plibCommonAnyType *Key , plibDataHBSTStatusFxType StatusFx , struct plibError *Error ) ;
+struct plibDataHBST* plibDataHBST_lookup( struct plibDataHBST *ThisNode , plibCommonAnyType *Key , plibDataHBSTStatusFxType StatusFx , struct plibError *Error ) ;
 
-bool plibDataHBST_pushSub( struct plibDataHBST *Node , plibCommonCountType Index , struct plibDataHBST *NewNode , plibDataHBSTStatusFxType StatusFx , struct plibErrorType *Error ) ;
-struct plibDataHBST* plibDataHBST_popSub( struct plibDataHBST *Node , plibCommonCountType Index , plibCommonAnyType *Key , plibDataHBSTStatusFxType StatusFx , struct plibErrorType *Error ) ;
+bool plibDataHBST_pushSub( struct plibDataHBST *Node , plibCommonCountType Index , struct plibDataHBST *NewNode , plibDataHBSTStatusFxType StatusFx , struct plibError *Error ) ;
+struct plibDataHBST* plibDataHBST_popSub( struct plibDataHBST *Node , plibCommonCountType Index , plibCommonAnyType *Key , plibDataHBSTStatusFxType StatusFx , struct plibError *Error ) ;
 
-bool plibDataHBST_traverse( struct plibDataHBST *EntryNode , plibDataHBSTTraversalFxType TraversalFx , plibCommonAnyType *Data , struct plibErrorType *Error ) ;
+bool plibDataHBST_traverse( struct plibDataHBST *EntryNode , plibDataHBSTTraversalFxType TraversalFx , plibCommonAnyType *Data , struct plibError *Error ) ;
