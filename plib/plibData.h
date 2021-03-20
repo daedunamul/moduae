@@ -26,8 +26,9 @@ enum plibDataKeyComparison
 } ;
 
 typedef uint64_t plibDataKeyType[ plibDataKeyLength ] ;
+typedef uint64_t plibDataKeyUnitType ;
 
-#define plibData_getKeyLength( Count ) ( Count == 0 ? 1 : 2 + ( Count - 1 ) / 8 )
+#define plibData_getKeyLength( Count ) ( Count == 0 ? 1 : 2 + ( ( Count - 1 ) >> 3 ) )
 
 void plibData_initializeKey( plibDataKeyType Key ) ;
 enum plibDataKeyComparison plibData_compareKey( plibDataKeyType Key1 , plibDataKeyType Key2 ) ;

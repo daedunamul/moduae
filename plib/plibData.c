@@ -63,9 +63,9 @@ void plibData_getKeyFromString( plibDataKeyType Key , char *String )
 	plibData_initializeKey( Key ) ;
 	while( Count < plibDataKeyStringLength && String[ Count ] != '\0' )
 	{
-		Index = 1 + Count / 8 ;
-		Key[ Index ] = ( Key[ Index ] << ( 8 * Count % 8 ) ) + String[ Count ] ;
+		Index = 1 + ( Count >> 3 ) ;
+		Key[ Index ] = ( Key[ Index ] << ( ( Count & 7 ) << 3 ) ) + String[ Count ] ;
 		Count ++ ;
 	}
-	Key[ 0 ] = Count ;
+	Key[ 0 ] = ( plibDataKeyUnitType )Count ;
 }
