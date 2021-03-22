@@ -5,21 +5,23 @@
 #pragma once
 #include "plibData.h"
 
-typedef uint32_t plibDataBTreeKeyType ;
+#define plibDataBTreeDegree 5
 
 struct plibDataBTreeNode
 {
-	plibCommonAnyType *Top , *Bottom ;
-	struct plibDataBTreeNode *Left , *Right ;
-	
-	plibDataBTreeKeyType Key ;
+	plibDataKeyType Key ;
 	plibCommonAnyType *Value ;
 } ;
-struct plibDataBTreeTable
+struct plibDataBTreeUnit
 {
-	struct plibDataBTreeTable *Top ;
-	struct plibDataBTreeNode *Head , *Tail ;
-	plibCommonCountType MaxCount , Count ;
+	struct plibDataBTreeNode Nodes[ plibDataBTreeDegree ] ;
+	plibCommonCountType NodeCount ;
+	
+	struct plibDataBTreeUnit *Top , *Bottoms[ plibDataBTreeDegree + 1 ] ;
+	plibCommonCountType BottomCount ;
 } ;
 
-plibDataBTree_initializeTable( struct plibDataBTreeTable *Table , plibCommonCountType MaxCount , struct plibError *Error ) ;
+void plibDataBTree_swapNode( struct plibDataBTreeNode *Node1 , struct plibDataBTreeNode *Node2 ) ;
+void plibDataBTree_sortNode( struct plibDataBTreeNode *NodeArray , plibCommonCountType NodeCount ) ;
+
+void plibDataBTree_initialize( struct plibDataBTreeUnit *Unit , struct plibError *Error ) ;

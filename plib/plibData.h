@@ -18,13 +18,13 @@ void plibData_swapNode( struct plibDataNode *Node1 , struct plibDataNode *Node2 
 // key
 #define plibDataKeyLength 9
 #define plibDataKeyStringLength 64
+
 enum plibDataKeyComparison
 {
 	plibDataKeyComparisonEqual = 0 , 
 	plibDataKeyComparisonLess = 1 , 
 	plibDataKeyComparisonGreat = 2 
 } ;
-
 typedef uint64_t plibDataKeyType[ plibDataKeyLength ] ;
 typedef uint64_t plibDataKeyUnitType ;
 
